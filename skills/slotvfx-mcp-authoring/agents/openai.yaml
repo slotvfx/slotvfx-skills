@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX MCP Authoring"
+  short_description: "Edit through MCP with readback and preservation"
+  default_prompt: "Use $slotvfx-mcp-authoring to make the requested SlotVFX edits through MCP."

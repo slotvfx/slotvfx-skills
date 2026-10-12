@@ -1,0 +1,12 @@
+---
+name: deliver-vfx
+description: Export or record approved SlotVFX effects as runtime assets, editable projects or MP4/WebM, and verify the requested delivery. Use when the user asks for a SlotVFX export or recording.
+---
+
+Use this skill for an explicit save, export or recording request. Ordinary creation/revision ends with the editable result ready in SlotVFX; it does not require a media file or chat viewer. Inspect app state, the requested project, clip/group and target before exporting. Read [delivery, recording and recovery checks](references/workflows.md), adapted from the existing showcase-video and effect-pack workflows. Use the bundled showcase-video skill for detailed combining/loop review when relevant. Resolve the format/destination if it cannot be inferred; keep existing authorization. Do not treat a generic export request as permission to publish to a service.
+
+Use `slotfx_export_runtime` for target data/diagnostics; this MCP call writes JSON files only, not the complete engine bundle. The artifacts list includes planned scripts/assets: only fileWrite.files proves written output. Finish a full bundle through the editor Game Runtime Export when available and authorized; otherwise report that exact remaining step. Write only to a task-owned destination with overwrite:false unless replacement is authorized. Exercise the resulting runtime before claiming parity, especially for masks, Spine, audio, instances and state triggers. Editor screenshots do not establish runtime correctness.
+
+For a video, inspect `slotfx_get_recorder`, select the exact timeline or saved scenario, and start a bounded recording. Retain jobId and poll `slotfx_get_recording` until job.lifecycleState is completed; only completed jobs can be delivered. `slotfx_cancel_recording` stops a task-owned job; cancellation is not a saved video. Use save_recording for a local deliverable, then poll job.saveState for saved/cancelled/failed. A successfully saved MCP recording remains job.state=ready for later retrieval; state alone does not prove a save. Use read_recording for bounded binary retrieval. Confirm actual codec, dimensions, fps, duration and frame count. Report source/rendered/exported frame rates separately when they differ.
+
+Save the editable .slotvfx project if requested. Identify actual output paths, target and limitations. If a step is interrupted, reconcile its receipt before retrying. If authentication, licensing or a native file picker needs the user, report the precise requirement and continue independent validation.

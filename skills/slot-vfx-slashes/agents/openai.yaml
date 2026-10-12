@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Slashes"
+  short_description: "Build readable, fast sword slashes in SlotVFX"
+  default_prompt: "Use $slot-vfx-slashes to build and verify a clean animated slash in SlotVFX from my reference."

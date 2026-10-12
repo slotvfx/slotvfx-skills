@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Per-Cell Effects"
+  short_description: "Build and verify effects repeated across cells"
+  default_prompt: "Use $slot-vfx-per-cell-effects to create a reusable per-cell effect in my SlotVFX project."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Performance"
+  short_description: "Measure and improve VFX runtime performance"
+  default_prompt: "Use $slot-vfx-performance to investigate the performance of my SlotVFX effects."

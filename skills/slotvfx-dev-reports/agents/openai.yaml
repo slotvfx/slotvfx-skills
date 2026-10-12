@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Developer Reports"
+  short_description: "Draft reproducible reports with measured evidence"
+  default_prompt: "Use $slotvfx-dev-reports to draft a local report for a reproduced SlotVFX issue."

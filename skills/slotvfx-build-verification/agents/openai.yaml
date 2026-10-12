@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Build Verification"
+  short_description: "Verify updates with controlled reproduction cases"
+  default_prompt: "Use $slotvfx-build-verification to verify the relevant fixes in a SlotVFX update."

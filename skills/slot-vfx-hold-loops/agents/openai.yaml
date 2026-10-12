@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Hold Loops"
+  short_description: "Create sustained effects with reliable stopping"
+  default_prompt: "Use $slot-vfx-hold-loops to create or refine a sustained effect in my SlotVFX project."

@@ -1,0 +1,14 @@
+---
+name: create-vfx
+description: Create, inspect or revise editable particles, artwork, logo reveals and game effects directly in SlotVFX Desktop. Show the result in the editor using its existing clip, focus and playback tools.
+---
+
+Use the connected SlotVFX tools; no source repository is needed. Start with `slotfx_get_app_state` and `slotfx_get_bridge_status`. If the bridge is unavailable, tell the user to open SlotVFX and enable Help → AI / MCP Bridge. Do not invent a connection or restart an app with unsaved work.
+
+For project creation/opening, use the app lifecycle tools and poll the returned operationId until terminal status, then wait for editorReady. Native save/discard/cancel dialogs are user decisions. Inspect the current project, hierarchy and clips before editing; preserve unrelated work. Resolve only missing visual decisions that matter (style, timing, target); use sensible defaults for a first draft.
+
+Read [workflow routes and authoring checks](references/workflows.md) for tool selection, key replacement, preservation and recovery. Use the matching bundled specialist skill for detailed logo, particle, hold or travel recipes; the guide provides common checks. For sword slashes, crescent cuts or directional attacks, read [the slash skill](../slot-vfx-slashes/SKILL.md). For the chosen effect, load only the relevant authoring guide and feature schemas. Existing logo composition knowledge and particle presets can provide a starting point. Choose effect layers, images, particles, paths or shaders to fit the requested result rather than forcing every design into particles.
+
+Use a new named group/clip for an alternative. Pass explicit clip membership where supported; parent-group membership can include child layers too. Read nested configuration and clip membership back after edits. Unknown properties may not produce an effect. For large key edits, use ordered batches below schema limits and retain the intended times/values for reconciliation.
+
+The result belongs in SlotVFX. Follow the guide's editor handoff: inspect the active clip, activate the requested one if needed, select/frame the result with `slotfx_focus_entity`, then use `slotfx_play_timeline` for natural playback when showing it. Playing a named timeline alone does not switch the editor to it. Read back editor state and leave the requested effect easy to find. Inspect entry, peak, tail and loop behavior in the editor; use a bounded capture only for a particular diagnostic. Revise until the design reads clearly at its intended size. Report what changed and name the clip/layers to inspect. Save, record or export only when requested. Respect disabled controls and explain the exact native step rather than substituting a chat viewer.

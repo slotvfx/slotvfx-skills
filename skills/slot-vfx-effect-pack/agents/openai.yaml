@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Effect Packs"
+  short_description: "Build cohesive gameplay VFX packs from game art"
+  default_prompt: "Use $slot-vfx-effect-pack to build a gameplay effect pack in my current SlotVFX project."

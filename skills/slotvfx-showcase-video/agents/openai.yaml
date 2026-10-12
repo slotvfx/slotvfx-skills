@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Showcase Videos"
+  short_description: "Record, verify and combine requested VFX videos"
+  default_prompt: "Use $slotvfx-showcase-video to record and deliver the requested SlotVFX videos."

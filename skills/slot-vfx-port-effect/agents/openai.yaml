@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Effect Porting"
+  short_description: "Port approved effects while preserving their look"
+  default_prompt: "Use $slot-vfx-port-effect to port an approved SlotVFX effect to another game project."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Logo Reveals"
+  short_description: "Build and refine logo reveals through SlotVFX MCP"
+  default_prompt: "Use $slotvfx-logo-reveals to create or refine a logo reveal in my current SlotVFX project."

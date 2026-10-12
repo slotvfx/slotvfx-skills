@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Travel Effects"
+  short_description: "Build re-aimable zaps, pulses, trails and impacts"
+  default_prompt: "Use $slot-vfx-travel-effects to build a re-aimable travel effect in my SlotVFX project."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Spin Showcases"
+  short_description: "Choreograph reel spins, anticipation and win lines"
+  default_prompt: "Use $slot-vfx-spin-showcase to build a spin and win showcase in my SlotVFX project."

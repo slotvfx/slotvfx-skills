@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Particle Recipes"
+  short_description: "Adapt particle recipes to the game and display size"
+  default_prompt: "Use $slot-vfx-particle-recipes to create a readable particle effect in my SlotVFX project."
