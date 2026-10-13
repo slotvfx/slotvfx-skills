@@ -7,7 +7,7 @@ Use the bundled [current workflow guide](references/workflows.md) for SlotVFX de
 
 # Spin, anticipation and win showcases
 
-Use the supplied game outcome or an explicitly authorized fictional presentation. Do not invent wins or change symbol results in an actual game replay. Infer choices already established in the conversation; clarify only missing decisions that materially affect the sequence.
+Use the supplied game outcome or an explicitly authorized fictional presentation. Do not invent wins, insert wilds or change symbol results in an actual game replay. A designed fictional showcase may put wilds on cells several paylines share, so three or four lines run through one landing; label it fictional. Infer choices already established in the conversation; clarify only missing decisions that materially affect the sequence.
 
 Inspect reel-strip assets, layout anchors, existing clips, symbol animations and current runtime constraints. Preserve existing groups/layers unless their direct revision was requested. New showcase variants get new named groups and clips with explicit membership.
 

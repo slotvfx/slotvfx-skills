@@ -54,7 +54,7 @@ Read [SlotVFX implementation notes](references/slotvfx-implementation.md) for co
 
 ## Add only what serves the strike
 
-The plain core is an intermediate study, not the final deliverable when the reference has rich material breakup and secondary motion. Once the motion works, complete the requested style. Read [layered slash craft](references/layered-slash-craft.md) for erosion, particle release and streak choreography.
+The plain core is an intermediate study, not the final deliverable when the reference has rich material breakup and secondary motion. Once the motion works, complete the requested style. Read [layered slash craft](references/layered-slash-craft.md) for erosion, particle release and streak choreography. To key a sweep's progress, tail or release schedule as exact keys rather than hand-placed handles, use [motion craft](../slot-vfx-motion-craft/SKILL.md).
 
 Add layers by role: a broad textured body, a brighter moving edge, a few unequal filaments, detached fragments and residual embers. A contact flash or smoke belongs only where the reference/attack needs it. Keep the dominant motion, brightness and timing with the slash. Reusing one static crescent three times is not a substitute for three distinct attack phases.
 

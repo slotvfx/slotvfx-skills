@@ -7,19 +7,19 @@ Use the bundled [current workflow guide](references/workflows.md) for SlotVFX de
 
 # Effects repeated per cell
 
-Author one reusable effect at a reference cell and record its centre, pivot and intended dimensions. Preserve existing work; a requested alternative gets its own named group/clip. Use the project's actual spawnable group type and runtime API.
+Author one reusable effect at a reference cell and record its centre, pivot and intended dimensions in the build notes. Preserve existing work; a requested alternative gets its own named group/clip. Use the project's actual spawnable group type and runtime API.
 
 ## Distinguish templates from displayed copies
 
-For spawnable/GameObject template groups, the rendered objects are runtime instances; ordinary scene groups may render directly. Resolve the instance's element IDs through the supported runtime API, such as `getGroupElementIds(instanceId)`, rather than writing to a bare template ID and assuming every live copy changed.
+For spawnable/GameObject template groups, the rendered objects are runtime instances; ordinary scene groups may render directly. Resolve the instance's element IDs through the supported runtime API, such as `getGroupElementIds(instanceId)`, rather than writing to a bare template ID and assuming every live copy changed. On an earlier build some writes to the template returned success while the copies on screen kept their old behavior.
 
-The supplied pack observed suffixed instance IDs. Discover them live and record the relationship to the template; never reuse an example project's ID. Use `render_layout`'s supported `previewInstance` mode to inspect a template at its intended mount point.
+The supplied pack observed suffixed instance IDs (`…__manual_runtime__1`). Discover them live and record the relationship to the template; never reuse an example project's ID. Use `render_layout`'s supported `previewInstance` mode to inspect a template at its intended mount point.
 
 ## Verify placement and phase
 
-One copy is a useful visual check, but it does not establish behavior at the game's maximum simultaneous count. For integration checks, spawn representative copies at different offsets and different times. Compare each with its own expected local phase and position.
+One copy is a useful visual check, but it does not establish behavior at the game's maximum simultaneous count; costs invisible at one copy can dominate at fifteen (on an earlier build, a per-copy draw call and per-layer work that grew with the square of the layer count). For integration checks, spawn representative copies at different offsets and different times. Compare each with its own expected local phase and position.
 
-Look for effects reading scene time instead of instance time, followers using the template's position, and baked animation restarting when unrelated ambience loops. Check birth, steady state, stop/tail and reuse of pooled copies where applicable.
+Look for effects reading scene time instead of instance time, followers using the template's position, and baked animation restarting when unrelated ambience loops. A copy mounted at an offset and started a few frames late catches all three. Check birth, steady state, stop/tail and reuse of pooled copies where applicable.
 
 For a performance task, measure realistic counts in the actual runtime: update time, draw calls, upload cost, particle counts and sheet memory as relevant. Do not build a large headless benchmark for every small visual revision; use [performance](../slot-vfx-performance/SKILL.md) when needed.
 
@@ -27,8 +27,8 @@ For a performance task, measure realistic counts in the actual runtime: update t
 
 - Start with a clear shape and a few accents; choose coverage from the current request rather than assuming every highlight must be a thin frame.
 - Cap particles per layer and account for the number of copies.
-- Check ribbon strands, segments and current batching support before deciding they are too expensive.
-- Consider a textured sprite for a static frame or a baked animated beam for suitable motion, but measure current native/baked cost and texture memory. Historical one-third-CPU and single-draw-call examples are not universal.
-- Inspect exported frame dimensions, pivot and `originalWidth`/height where present. A large transparent quad still costs overdraw even if the visible mark is small. The pack's 0.9.50 fitted-frame claim needs confirmation in the exported artifact.
+- Check ribbon strands, segments and current batching support (whether the runtime shares one mesh across copies) before deciding they are too expensive.
+- Consider a textured sprite for a static frame or a baked animated beam for suitable motion, but measure current native/baked cost and texture memory. On an earlier build a baked beam around the cell frame replaced a particle trail for about a third of the CPU and a single draw call; such historical examples are not universal.
+- Inspect exported frame dimensions, pivot and `originalWidth`/height where present. A large transparent quad still costs overdraw even if the visible mark is small, and every copy draws it. The pack's 0.9.50 fitted-frame claim (frames fitted to each effect, where older bundles used one shared box) needs confirmation in the exported artifact.
 
-Offer a second version when there is a meaningful visual or performance tradeoff. Build it when within the authorized alternatives or optimization scope; do not automatically double the work or replace the approved effect. Save the selected result and give the game developer the correct origin, instance API, stop behavior and measured limits.
+Offer a second version when there is a meaningful visual or performance tradeoff. Build it when within the authorized alternatives or optimization scope; do not automatically double the work or replace the approved effect. Document the measured cost of each version, and say when a later engine fix has narrowed the gap so the choice rests on current numbers. Save the selected result and give the game developer the correct origin, instance API, stop behavior and measured limits.

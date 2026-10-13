@@ -54,7 +54,9 @@ Runtime source, editable .slotvfx project and rendered video are different deliv
 
 ## Reuse existing expertise
 
-These routes support the 19 skills in this distribution: five workflow entrypoints plus 14 specialists, linked references and optional recording helpers. Load only the relevant installed sibling skills for the request. Current user instructions, installed schemas, readback and actual results take precedence over historical examples. Tool availability still depends on a separate local MCP connection; host approvals and native licensing/access remain in effect.
+These routes support the 20 skills in this distribution: five workflow entrypoints plus 15 specialists, linked references and optional recording helpers. Load only the relevant installed sibling skills for the request. Current user instructions, installed schemas, readback and actual results take precedence over historical examples. Tool availability still depends on a separate local MCP connection; host approvals and native licensing/access remain in effect.
+
+For a new or rejected visual direction, apply the [visual-direction checkpoint](../../slot-vfx-effect-pack/SKILL.md#establish-a-visual-direction) before extending it into a pack. Tie each layer to the brief and verify the representative effect at player scale. Successful tool calls establish an edit; appearance requires observed playback, and runtime claims require target testing. This adds self-review, not an automatic user-approval gate.
 
 ## Authoring checks
 
@@ -67,6 +69,7 @@ For timing-critical particles, inspect and set lifespan/angle variance deliberat
 ## Specialist checks
 
 - **Slashes:** use [the slash specialist](../../slot-vfx-slashes/SKILL.md) for an advancing head, eroding tail, coherent material breakup and particles released along the sweep. Verify natural motion before adding accent layers.
+- **Motion timing:** use [the motion-craft specialist](../../slot-vfx-motion-craft/SKILL.md) to choose eases, springs, staggers and beats and write them as exact keys. On 0.9.59, free-tangent keys evaluate exactly as a CSS cubic-bezier, so a named ease is two keys and a spring a handful of fitted keys; read representative values back with `get_timeline` motion samples.
 - **Held effects:** distinguish entry, sustain and exit. A single clip can be sufficient; use separate stages/states only when their control is needed. Verify two/four clip lengths and the longest intended hold, then an explicit stop and its tail in the target engine. Do not add loop=true by habit or assume bursts repeat identically on clip and base-timeline wraps.
 - **Per-cell copies:** author at a known pivot/anchor and resolve live instance element IDs through the runtime's actual API. Test several offsets, late starts and the intended maximum simultaneous count when integration/performance is in scope. Check each instance's local phase, stop and reuse. A template-ID write does not prove its instances changed.
 - **Travel:** use a clear driver and intentional birth/death/rider/trail relationships. Re-aim the live instance in the API's required coordinate space. Translated-only subtraction is not sufficient for rotated/scaled parents. Test left/right routes, a second destination, a late-started instance, impact at B and cleanup. Verify current driver/follower limits before building chains.

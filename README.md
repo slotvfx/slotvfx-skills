@@ -2,7 +2,7 @@
 
 SlotVFX is a 2D game effects editor for particles, shaders, effects, timelines and state machines.
 
-Nineteen reusable skills for creating, revising, reviewing and delivering effects in SlotVFX Desktop. Each skill is a folder with `SKILL.md`; this repository snapshot includes its references, agent metadata and optional helper scripts.
+Twenty reusable skills for creating, revising, reviewing and delivering effects in SlotVFX Desktop. Each skill is a folder with `SKILL.md`; this repository snapshot includes its references, agent metadata and optional helper scripts.
 
 **Skills are guidance, not a connection.** This distribution contains no SlotVFX application, MCP server, plugin manifest, account issuer, gateway, credentials or game projects. To run the tools, use a compatible SlotVFX Desktop build and connect your AI client to the app's existing local MCP adapter. Tool access, native asset grants, account licensing and your client's normal approval controls remain separate.
 
@@ -12,7 +12,7 @@ Nineteen reusable skills for creating, revising, reviewing and delivering effect
 2. Connect the client to the local adapter supplied with that Desktop build. The exact client setup depends on the client and app version; these skills do not configure it for you.
 3. Ask the client to call `slotfx_get_bridge_status` and then `slotfx_get_app_state` without edits. Confirm a compatible bridge and the intended project before authoring.
 
-For Codex, install **all 19** `skills/<name>` folders into your Codex skills directory (typically `~/.codex/skills/<name>`) using its GitHub skill installer or a careful copy that does not overwrite existing folders. Install them together: some skills link to sibling skills. Restart or start a new client session so it discovers them. Other skill-capable clients may use a different installation location and may not support the same behavior; follow that client's documentation. The optional video helpers need their stated local dependencies only when used.
+For Codex, install **all 20** `skills/<name>` folders into your Codex skills directory (typically `~/.codex/skills/<name>`) using its GitHub skill installer or a careful copy that does not overwrite existing folders. Install them together: some skills link to sibling skills. Restart or start a new client session so it discovers them. Other skill-capable clients may use a different installation location and may not support the same behavior; follow that client's documentation. The optional video helpers need their stated local dependencies only when used.
 
 ## Skills
 
@@ -24,6 +24,7 @@ For Codex, install **all 19** `skills/<name>` folders into your Codex skills dir
 | [motion-sequence](skills/motion-sequence/SKILL.md) | Author SlotVFX trailers, motion graphics and multi-stage sequences using clips, Scene Animator states, recorder scenarios, shaders, artwork and Spine animation. |
 | [slot-vfx-effect-pack](skills/slot-vfx-effect-pack/SKILL.md) | Build a complete slot VFX pack in SlotVFX from a game brief, GDD and art: map the board, author effect groups and clips, verify in context, and prepare a practical game integration handoff. |
 | [slot-vfx-hold-loops](skills/slot-vfx-hold-loops/SKILL.md) | Create or repair SlotVFX effects that sustain for variable durations, such as anticipation, win count-ups and cell highlights. Separate entry from sustain, verify loop seams and explicit stopping in the target runtime. |
+| [slot-vfx-motion-craft](skills/slot-vfx-motion-craft/SKILL.md) | Write how a SlotVFX effect moves — eases, springs, scale pops, staggers, beats, win escalation, loops — as exact timeline keys. Use with the build skills whenever something animates. |
 | [slot-vfx-particle-recipes](skills/slot-vfx-particle-recipes/SKILL.md) | Particle looks that worked in SlotVFX (impacts, rain ripples, portals, flames, ambience, coin fountains, props with glows) and the parameter traps that silently break them. |
 | [slot-vfx-per-cell-effects](skills/slot-vfx-per-cell-effects/SKILL.md) | Author SlotVFX effects used on many cells as spawnable templates, including win glows and lock rings, and verify instance placement, phase, lifetime and performance at realistic counts. |
 | [slot-vfx-performance](skills/slot-vfx-performance/SKILL.md) | Investigate SlotVFX frame-rate or export-cost problems with controlled measurements in the actual target runtime. Compare realistic copy counts, simulation, draw calls, uploads, overdraw and baked alternatives. |
@@ -40,6 +41,6 @@ For Codex, install **all 19** `skills/<name>` folders into your Codex skills dir
 
 ## Scope and provenance
 
-This is a skills-only snapshot of the maintained SlotVFX guides. The skill text was kept intact except for portable links to a copied workflow guide and wording that no longer assumes plugin installation. The workflow guide is embedded with each skill that links to it, so individual folders retain that reference after installation. The two helper scripts remain inside their original skill folders.
+This is a skills-only snapshot of the maintained SlotVFX guides. The skill text was kept intact except for portable links to a copied workflow guide and wording that no longer assumes plugin installation. The workflow guide is embedded with each skill that links to it, so individual folders retain that reference after installation. The helper scripts remain inside their skill folders.
 
 External reference links are for study; their images, media and project files are not included. This bundle does not grant access to local files or authorize unrequested publishing, deletion or credentials. The original skills and helper scripts are available under the [MIT License](LICENSE); linked third-party work is not relicensed here. See [third-party notices](NOTICE.md). Contributions are welcome through reviewed pull requests; see [CONTRIBUTING.md](CONTRIBUTING.md).

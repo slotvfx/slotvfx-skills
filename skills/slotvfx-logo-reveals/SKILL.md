@@ -26,7 +26,7 @@ Start with a clear action: assemble, ricochet, brake, strike, correct, launch, o
 Design checks:
 
 - Match motion style to the requested identity: playful, mechanical, elegant, cinematic or magical as appropriate.
-- Vary choreography and rhythm; use reflections selectively rather than repeating the same shine sweep.
+- Vary choreography and rhythm; use a material-aware reflection selectively, or omit it, rather than repeating the same shine sweep.
 - Move components independently only when requested or useful, and preserve correct final alignment and source identity.
 - Judge generated particles at their actual display size; simple silhouettes can communicate better than intricate sprites.
 - Match shader coverage and glow to the target: compact gameplay effects and cinematic videos have different needs.
@@ -35,7 +35,7 @@ These are design checks, not inherited personal preferences. Do not add generate
 
 ## Build and revise
 
-Establish the logo's entrance, strongest beat, settling motion, and readable finish. Tune those before adding a dense effects stack. Keep particles tied to contacts, acceleration, discharge, or another visible cause. Parameterize dimensions, colors, pivots, timing, and intensity for the current logo.
+Establish the logo's entrance, strongest beat, settling motion, and readable finish. Tune those before adding a dense effects stack. Use [motion craft](../slot-vfx-motion-craft/SKILL.md) to key those eases, springs and beats exactly. Keep particles tied to contacts, acceleration, discharge, or another visible cause. Parameterize dimensions, colors, pivots, timing, and intensity for the current logo.
 
 Keep components independently editable and name layers by their role, for example “Mechanical Snap · Emblem Left Piece” or “Speedrun · Brake Sparks.” For a localized revision, change the named component and visually verify the untouched components instead of redesigning the whole effect.
 

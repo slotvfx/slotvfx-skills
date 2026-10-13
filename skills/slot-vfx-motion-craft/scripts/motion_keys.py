@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+r"""Keys and stagger tables for SlotVFX motion, from named eases and springs.
+
+SlotVFX timeline keys with tangents {mode:"free", out:{dt,dv}, in:{dt,dv}}
+evaluate exactly like a CSS / After Effects cubic-bezier between two keys, so
+a named ease becomes two keys, and anything else (springs, log-space scale)
+becomes a handful of fitted bezier keys.
+
+  ease     two keys with handles for a named ease
+           motion_keys.py ease --target image:banner --property scaleX \
+               --from 0.2 --to 1 --start 0.3 --duration 0.45 --ease expo.out --log
+  spring   a damped spring as fitted bezier keys (or --sampled linear keys)
+           motion_keys.py spring --target image:banner --property y --from 380 --to 540 \
+               --start 0.3 --response 0.45 --damping 0.6
+           motion_keys.py spring ... --period 0.13 --decay 0.075   (spin-showcase landing)
+  stagger  per-cell delays for a rows x cols board
+           motion_keys.py stagger --rows 3 --cols 5 --origin center --amount 0.3
+
+--log interpolates in log space (for scale): equal ratios per frame instead of
+equal steps, so a pop does not look like it stalls as it grows.
+Key output is JSON: a list of batches of <= 180 keys for slotfx_set_timeline_keyframes
+(timeMode "exact"). A summary goes to stderr.
+"""
+import argparse, json, math, random, sys
+
+EASES = {  # cubic-bezier(x1, y1, x2, y2); GSAP names, easings.net curves
+    'linear': (0, 0, 1, 1),
+    'power1.in': (.11, 0, .5, 0), 'power1.out': (.5, 1, .89, 1), 'power1.inOut': (.45, 0, .55, 1),
+    'power2.in': (.32, 0, .67, 0), 'power2.out': (.33, 1, .68, 1), 'power2.inOut': (.65, 0, .35, 1),
+    'power3.in': (.5, 0, .75, 0), 'power3.out': (.25, 1, .5, 1), 'power3.inOut': (.76, 0, .24, 1),
+    'power4.in': (.64, 0, .78, 0), 'power4.out': (.22, 1, .36, 1), 'power4.inOut': (.83, 0, .17, 1),
+    'sine.in': (.12, 0, .39, 0), 'sine.out': (.61, 1, .88, 1), 'sine.inOut': (.37, 0, .63, 1),
+    'expo.in': (.7, 0, .84, 0), 'expo.out': (.16, 1, .3, 1), 'expo.inOut': (.87, 0, .13, 1),
+    'circ.in': (.55, 0, 1, .45), 'circ.out': (0, .55, .45, 1), 'circ.inOut': (.85, 0, .15, 1),
+    'back.in': (.36, 0, .66, -.56), 'back.out': (.34, 1.56, .64, 1), 'back.inOut': (.68, -.6, .32, 1.6),
+}
+
+def bezier_y(p, x):
+    """CSS cubic-bezier: y for progress x."""
+    x1, y1, x2, y2 = p
+    bx = lambda s: 3 * x1 * s * (1 - s) ** 2 + 3 * x2 * s * s * (1 - s) + s ** 3
+    lo, hi = 0.0, 1.0
+    for _ in range(50):
+        m = (lo + hi) / 2
+        lo, hi = (m, hi) if bx(m) < x else (lo, m)
+    s = (lo + hi) / 2
+    return 3 * y1 * s * (1 - s) ** 2 + 3 * y2 * s * s * (1 - s) + s ** 3
+
+# ---------- fitting any f(t) on [0, T] with a few bezier keys ----------
+
+def deriv(f, t, T):
+    h = 1e-5
+    a, b = max(0.0, t - h), min(T, t + h)
+    return (f(b) - f(a)) / (b - a)
+
+def fit_segment(f, t0, t1, T):
+    """Handles matching the end slopes; lengths chosen to minimise max error."""
+    d = t1 - t0; s0, s1 = deriv(f, t0, T), deriv(f, t1, T)
+    v0, v1 = f(t0), f(t1)
+    probe = [t0 + d * k / 16 for k in range(1, 16)]
+    want = [f(t) for t in probe]
+    best = None
+    for i in range(3, 70, 3):
+        for j in range(3, 70, 3):
+            a, b = d * i / 100, d * j / 100
+            P = ((t0, v0), (t0 + a, v0 + s0 * a), (t1 - b, v1 - s1 * b), (t1, v1))
+            err = 0.0
+            for t, w in zip(probe, want):
+                lo, hi = 0.0, 1.0
+                for _ in range(30):
+                    m = (lo + hi) / 2
+                    x = (1-m)**3*P[0][0] + 3*m*(1-m)**2*P[1][0] + 3*m*m*(1-m)*P[2][0] + m**3*P[3][0]
+                    lo, hi = (m, hi) if x < t else (lo, m)
+                m = (lo + hi) / 2
+                y = (1-m)**3*P[0][1] + 3*m*(1-m)**2*P[1][1] + 3*m*m*(1-m)*P[2][1] + m**3*P[3][1]
+                err = max(err, abs(y - w))
+                if best and err >= best[0]: break
+            if best is None or err < best[0]:
+                best = (err, (a, s0 * a), (-b, -s1 * b))
+    return best
+
+def fit_keys(f, T, ts, tol):
+    ts = sorted(set(round(t, 9) for t in ts + [0.0, T]))
+    for _ in range(7):
+        out, split = [ts[0]], False
+        for t0, t1 in zip(ts, ts[1:]):
+            if fit_segment(f, t0, t1, T)[0] > tol:
+                out.append((t0 + t1) / 2); split = True
+            out.append(t1)
+        ts = out
+        if not split: break
+    keys, worst, pending_in = [], 0.0, None
+    for i, t in enumerate(ts):
+        tang = {"mode": "free"}
+        if pending_in: tang["in"] = pending_in
+        if i + 1 < len(ts):
+            err, o, n = fit_segment(f, t, ts[i + 1], T)
+            worst = max(worst, err)
+            tang["out"] = {"dt": round(o[0], 6), "dv": round(o[1], 5)}
+            pending_in = {"dt": round(n[0], 6), "dv": round(n[1], 5)}
+        keys.append((t, f(t), tang))
+    return keys, worst
+
+# ---------- springs ----------
+
+def spring_fn(w, z, x0, v0):
+    """Displacement from the target at time t (closed form, no state)."""
+    if z < 1:
+        wd = w * math.sqrt(1 - z * z); B = (v0 + z * w * x0) / wd
+        return lambda t: math.exp(-z * w * t) * (x0 * math.cos(wd * t) + B * math.sin(wd * t))
+    if z == 1:
+        B = v0 + w * x0
+        return lambda t: math.exp(-w * t) * (x0 + B * t)
+    r1, r2 = -w * (z - math.sqrt(z * z - 1)), -w * (z + math.sqrt(z * z - 1))
+    C2 = (v0 - r1 * x0) / (r2 - r1); C1 = x0 - C2
+    return lambda t: C1 * math.exp(r1 * t) + C2 * math.exp(r2 * t)
+
+def emit(a, keys, note):
+    rows = [{"targetId": a.target, "property": a.property, "time": round(a.start + t, 6),
+             "timeMode": "exact", "value": round(v, 5), "tangents": tang} for t, v, tang in keys]
+    print(note, file=sys.stderr)
+    json.dump([rows[i:i + 180] for i in range(0, len(rows), 180)], sys.stdout)
+    print()
+
+def cmd_ease(a):
+    p = EASES[a.ease]; D = a.duration
+    if not a.log:
+        dv = a.to - a.frm
+        keys = [(0.0, a.frm, {"mode": "free", "out": {"dt": round(p[0] * D, 6), "dv": round(p[1] * dv, 5)}}),
+                (D, a.to, {"mode": "free", "in": {"dt": round((p[2] - 1) * D, 6), "dv": round((p[3] - 1) * dv, 5)}})]
+        return emit(a, keys, f"{a.ease}: 2 keys, exact")
+    if a.frm <= 0 or a.to <= 0: sys.exit('--log needs positive --from and --to (scale)')
+    r = a.to / a.frm
+    f = lambda t: a.frm * r ** bezier_y(p, min(1.0, max(0.0, t / D)))
+    tol = a.fit_tol if a.fit_tol is not None else 0.002 * abs(a.to - a.frm)
+    keys, worst = fit_keys(f, D, [], tol)
+    keys[-1] = (D, a.to, keys[-1][2])
+    emit(a, keys, f"{a.ease} in log space: {len(keys)} keys, worst fit error {worst:.4g}")
+
+def cmd_spring(a):
+    if a.response:
+        w, z = 2 * math.pi / a.response, a.damping
+    elif a.period and a.decay:
+        wd, zw = 2 * math.pi / a.period, 1 / a.decay
+        w = math.hypot(wd, zw); z = zw / w
+    else:
+        sys.exit('give --response (with --damping) or --period with --decay')
+    if a.log:
+        if a.frm <= 0 or a.to <= 0: sys.exit('--log needs positive values')
+        L0, L1 = math.log(a.frm), math.log(a.to)
+        x = spring_fn(w, z, L0 - L1, a.v0 / a.frm)
+        f = lambda t: math.exp(L1 + x(t))
+    else:
+        x = spring_fn(w, z, a.frm - a.to, a.v0)
+        f = lambda t: a.to + x(t)
+    span = abs(a.to - a.frm) or abs(a.v0) / w
+    eps = a.settle if a.settle is not None else 0.002 * span
+    T, t = 0.0, 0.0
+    while t < 10:
+        if abs(f(t) - a.to) > eps: T = t
+        t += 1 / 2000
+    T += 1 / 2000
+    sgn = 1 if a.to >= a.frm else -1
+    peak = max((f(k / 2000) - a.to) * sgn for k in range(int(T * 2000) + 1))
+    over = f"overshoot {max(peak, 0):.4g}" + (f" ({100 * max(peak, 0) / span:.1f}% of travel)" if a.to != a.frm else "")
+    head = f"damping ratio {z:.3f}, response {2 * math.pi / w:.3f}s, settles in {T:.3f}s, {over}"
+    if a.sampled:
+        n = math.ceil(T * a.fps)
+        keys = [(min(i / a.fps, T), a.to if i == n else f(i / a.fps), {"mode": "linear"}) for i in range(n + 1)]
+        return emit(a, keys, head + f"; {len(keys)} linear keys at {a.fps:g} fps")
+    ts, prev, step = [], None, 1 / 4000
+    for k in range(1, int(T / step)):           # peaks, troughs and target crossings
+        t = k * step; d = f(t + step) - f(t)
+        if prev is not None and prev * d < 0: ts.append(t)
+        if (f(t) - a.to) * (f(t + step) - a.to) < 0: ts.append(t + step / 2)
+        prev = d
+    tol = a.fit_tol if a.fit_tol is not None else 0.0025 * span
+    keys, worst = fit_keys(f, T, ts, tol)
+    keys[-1] = (T, a.to, keys[-1][2])
+    emit(a, keys, head + f"; {len(keys)} bezier keys, worst fit error {worst:.4g}")
+
+def cmd_stagger(a):
+    R, C = a.rows, a.cols
+    cells = [(r, c) for r in range(R) for c in range(C)]
+    if a.origin == 'center':   d = {rc: math.hypot(rc[0] - (R - 1) / 2, rc[1] - (C - 1) / 2) for rc in cells}
+    elif a.origin == 'edges':
+        m = {rc: math.hypot(rc[0] - (R - 1) / 2, rc[1] - (C - 1) / 2) for rc in cells}
+        top = max(m.values()); d = {rc: top - v for rc, v in m.items()}
+    elif a.origin == 'start':  d = {rc: math.hypot(*rc) for rc in cells}
+    elif a.origin == 'end':    d = {rc: math.hypot(R - 1 - rc[0], C - 1 - rc[1]) for rc in cells}
+    elif a.origin == 'reels':  d = {rc: rc[1] for rc in cells}
+    elif a.origin == 'random':
+        rnd = random.Random(a.seed); order = cells[:]; rnd.shuffle(order)
+        d = {rc: i for i, rc in enumerate(order)}
+    elif a.origin.startswith('line:'):          # payline: row index per column, e.g. line:1,0,0,0,1
+        rows = [int(v) for v in a.origin[5:].split(',')]
+        d = {(r, c): c for c, r in enumerate(rows)}
+    else: sys.exit('origin: center|edges|start|end|reels|random|line:r,r,...')
+    top = max(d.values()) or 1
+    p = EASES[a.ease]
+    delay = {}
+    for rc, v in d.items():
+        delay[rc] = round((a.amount * bezier_y(p, v / top)) if a.amount is not None else a.each * v, 4)
+    for r in range(R):
+        print('  '.join(f"{delay[(r, c)]:5.3f}" if (r, c) in delay else '   - ' for c in range(C)))
+    print(json.dumps([{"row": r, "col": c, "delay": delay[(r, c)]} for (r, c) in sorted(delay)]))
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest='cmd', required=True)
+    for name in ('ease', 'spring'):
+        s = sub.add_parser(name)
+        s.add_argument('--target', required=True); s.add_argument('--property', required=True)
+        s.add_argument('--from', dest='frm', type=float, required=True); s.add_argument('--to', type=float, required=True)
+        s.add_argument('--start', type=float, default=0.0)
+        s.add_argument('--log', action='store_true', help='interpolate in log space (scale)')
+        s.add_argument('--fit-tol', type=float, help='max fit error per segment, value units')
+    se = sub.choices['ease']
+    se.add_argument('--duration', type=float, required=True)
+    se.add_argument('--ease', choices=sorted(EASES), default='power3.out')
+    ss = sub.choices['spring']
+    ss.add_argument('--response', type=float, help='seconds per undamped oscillation')
+    ss.add_argument('--damping', type=float, default=1.0, help='damping ratio, 1 = no overshoot')
+    ss.add_argument('--period', type=float, help='seconds per visible wobble (alternative form)')
+    ss.add_argument('--decay', type=float, help='decay time constant in seconds (alternative form)')
+    ss.add_argument('--v0', type=float, default=0.0, help='starting velocity, value units/s')
+    ss.add_argument('--settle', type=float, help='settled when within this many value units')
+    ss.add_argument('--sampled', action='store_true', help='linear keys every 1/fps instead of bezier keys')
+    ss.add_argument('--fps', type=float, default=60.0)
+    st = sub.add_parser('stagger')
+    st.add_argument('--rows', type=int, required=True); st.add_argument('--cols', type=int, required=True)
+    st.add_argument('--origin', default='center')
+    st.add_argument('--amount', type=float, help='total spread in seconds (first to last)')
+    st.add_argument('--each', type=float, help='or seconds per unit of distance')
+    st.add_argument('--ease', choices=sorted(EASES), default='linear', help='shape of the spread')
+    st.add_argument('--seed', type=int, default=1)
+    a = p.parse_args()
+    if a.cmd == 'stagger' and (a.amount is None) == (a.each is None):
+        p.error('stagger needs exactly one of --amount or --each')
+    {'ease': cmd_ease, 'spring': cmd_spring, 'stagger': cmd_stagger}[a.cmd](a)
+
+if __name__ == '__main__':
+    main()
