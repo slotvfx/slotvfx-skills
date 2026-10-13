@@ -1,6 +1,6 @@
 # SlotVFX MCP authoring notes
 
-Original authoring tests used SlotVFX **0.9.49** on 2026-09-26. The installed **0.9.50** MCP schema was subsequently checked for named recording, repeated-cycle capture, imports and Image FX parameter references. Distinguish those schema checks from visual/runtime tests. Prefer current tool descriptions before unfamiliar edits.
+Original authoring tests used SlotVFX **0.9.49** on 2026-09-26. The installed **0.9.50** MCP schema was subsequently checked for named recording, repeated-cycle capture, imports and Image FX parameter references. Clip membership on duplicate/create and the import contract were re-checked on **0.9.59**. Distinguish those schema checks from visual/runtime tests. Prefer current tool descriptions before unfamiliar edits.
 
 ## Connection and inventory
 
@@ -26,7 +26,7 @@ Useful reads:
 - `slotfx_get_assets` and `slotfx_export_asset`: inspect the actual logo or source sprite.
 - `slotfx_find_features`: discover feature IDs/value schemas; the tested result limit was at most 50.
 - `slotfx_get_feature_schema`: on 0.9.50, inspect `image.fxParams.<type>` for the relevant Image FX parameter defaults, ranges and named enums.
-- `slotfx_import_asset`: 0.9.50 supports `sourcePath` and optional `folderGrantId`. Resolve access on the MCP server; if inline data is necessary, encode it programmatically rather than transcribing base64.
+- `slotfx_import_asset`: accepts `sourcePath` (0.9.50+) with an optional `folderGrantId` from `slotfx_choose_asset_folder` for a user-approved folder; without a grant, paths resolve on the MCP server under its `SLOTFX_MCP_ASSET_ROOTS`. The 0.9.59 schema also takes a data URL, remote URL or inline data, and a programmatically encoded PNG data URL imported fine. Encode inline data programmatically; never transcribe base64 by hand.
 
 Snapshot relevant original feature values, timeline memberships/tracks, and shared graphs before substantial batches. Avoid comparing transient geometry or visibility evaluated at different times.
 
@@ -34,8 +34,9 @@ Snapshot relevant original feature values, timeline memberships/tracks, and shar
 
 - Give each new concept a unique group/timeline and explicitly include `group:<id>` rather than inheriting the scene.
 - `slotfx_create_timeline` has `makeActive`; the default need not switch the editor. Pass the intended timeline ID to later animation calls.
-- For layer duplication, set `clipIds` to destination clips. In 0.9.50, the schema explicitly says whole-parent-group inclusion still applies even with `clipIds: []`. Inspect group and direct layer membership. The 0.9.49 workflow encountered a rejection in that situation; preserve existing membership while resolving the intended destination.
-- Group duplication can also copy clips. Inspect returned IDs/memberships and shader bindings; do not assume a shallow copy or independent graph.
+- For layer duplication, set `clipIds` to destination clips. On 0.9.59 (source-checked): with `clipIds` omitted, the copy joins the clips its *original* plays in, not the open clip; `clipIds: []` removes direct membership, but a clip that includes the copy's parent group (`group:<id>`) still includes it. Read the reply's `duplicate.clipIds`, which lists every clip that effectively includes the copy. On 0.9.49, `clipIds: []` was rejected when the destination group was included whole in a clip; preserve existing membership while resolving the intended destination.
+- `slotfx_create_entity` has no `clipIds` parameter. On 0.9.59, images created while a clip was active were added to that clip's `includedLayerIds`. Read the clip back after creating and correct it with `slotfx_update_timeline`, passing the full list.
+- Group duplication copies the group's owned clips and rejects `clipIds` (0.9.59). Inspect returned IDs/memberships and shader bindings; do not assume a shallow copy or independent graph.
 - Entity type is `effect`; shader-effect features use `vfxEffect.*`. Timeline targets use `vfx:<id>` for VFX effects. Check current schemas if uncertain.
 - Tested write limits: 25 initial particle feature values, 100 property changes, and 200 timeline keys per batch.
 - Use `timeMode: "exact"` for precise keys. Legacy time mode rounded to tenths.

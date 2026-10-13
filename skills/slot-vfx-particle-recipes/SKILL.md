@@ -19,10 +19,10 @@ These are historical failure cases. Inspect current tool warnings and defaults; 
 | --- | --- | --- |
 | The pack observed `lifeSpanVariance` defaulting to **0.4 s** (seconds, not a fraction). | A 0.25 s spark lives anywhere from 0 to 0.65 s, and a Target Point head arrives late. | Set it on every layer: 0 for anything that has to land on time. |
 | The pack observed a wide default `angleVariance`. | A light column drifts sideways and a fan loses its shape. | Set it explicitly. `create_layers` warns about this; the warning is real. |
-| Older tested builds accepted some `config.*` keys (emission rate, angle) without animating them. | A keyed rate change renders byte-identical to no key. | Check the current animatable-property schema. If rate animation is unsupported, use separate emitters split by `startTime` / `duration` for surge and sustain. Verify other supported tracks rather than assuming all accepted keys animate. |
+| Older tested builds accepted some `config.*` keys (emission rate, angle) without animating them; only opacity, x / y and image-transform keys drove anything there. | A keyed rate change renders byte-identical to no key. | Check the current animatable-property schema. If rate animation is unsupported, use separate emitters split by `startTime` / `duration` for surge and sustain. Verify other supported tracks rather than assuming all accepted keys animate. |
 | A keyed emitter in world space (`simulationSpace` 1). | A long-lived glow stays where it was born while the prop it should follow moves away. | Anything that must stay on a moving prop goes in **local space (0)**, keyed with the same x / y times as the prop. |
 | `startTime` belongs to the layer, not the clip. | A layer shared by two clips fires at the same time in both. | For visual gating, opacity keys can hide it until the beat; simulation may still run. Use clip membership or separate timed layers when actual births must be delayed. |
-| An immortal burst at 0 s in a looping clip. | Missing on frame 0 and at every seam. | Try a small supported prewarm only if this fault reproduces; compare an immediate-birth setup and measure startup cost. |
+| An immortal burst at 0 s in a looping clip. | Missing on frame 0 and at every seam. | Try a small supported prewarm only if this fault reproduces (`prewarmDuration` 0.2 s fixed it on an earlier build); compare an immediate-birth setup and measure startup cost. |
 | An orbit emitter (`emitterType` 1) with `angleVariance` 0. | Every particle is born at the same angle, so a "gather from all sides" arrives from one side. | Keep a full angle spread on orbit emitters. |
 | A burst of 2 with `path.evenSpacing` on mortal path particles. | Both land in the same slot. | Use one layer per head, with `path.spacingOffset` 0 and 0.5. |
 | A spawn-sync follower of a prewarmed immortal driver. | Never spawns. | Give it its own rider on the same path, speed and anchor. |
@@ -75,9 +75,11 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 
 ### Ambient loops
 
-- **Light shafts:** an immortal or stable sprite with a verified first frame; the pack used 0.2 s of prewarm. Optional subtle opacity breathing can use a different offset per shaft.
+- **Light shafts:** an immortal or stable sprite with a verified first frame; the pack used 0.2 s of prewarm. Optional subtle opacity breathing (the pack kept it to 5% or less on the loop period) can use a different offset per shaft.
 - **Pollen or motes:** keep the focal area clear when the composition calls for it. The pack used side thirds and about 3 s of prewarm; use only enough warm-up to establish the desired population, and measure startup cost.
 - **One event per lap:** opacity keys give a steady loop a heartbeat.
+
+Prewarm costs startup time on every play. Before reaching for it, try a burst at t=0, a burst start-age spread, or immortal particles with toroidal wrap.
 
 ### Coin fountain
 
@@ -102,7 +104,7 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 - **Shards:** one shaded grey-RGB texture tinted per layer, with damping so they stop within half a cell.
 - **A halo behind an opaque symbol:** about **1.6×** the symbol, or it doesn't show.
 - **Riders on a bright beam:** wider than the beam's glow, or spiky (a star4), or they vanish into its core.
-- **One-shots repeated on a card or site:** consider a stable background or source marker if an empty gap looks accidental. A deliberate blackout can be part of the requested rhythm.
+- **One-shots repeated on a card or site:** consider a stable background or source marker (such as the source cell or a meter) if an empty gap looks accidental. A deliberate blackout can be part of the requested rhythm.
 
 ## Textures
 
@@ -110,11 +112,11 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 - **Size a texture by its core, not its canvas.**
   - A line with a 1-texel core in a 16 px-tall texture vanishes at 3 px tall and reads cleanly at 11 px.
   - A dot whose bright core is 22% of its size needs 18–22 px to show as a 4–5 px speck.
-- **Star generators:** inspect the actual generator and output. Parameter names such as `inner` are not standardized. Use current native `create_texture` presets when suitable; this skill does not include a separate arbitrary-artwork generator.
+- **Star generators:** inspect the actual generator and output. Parameter names such as `inner` are not standardized; in one earlier generator `inner` read backwards (low values gave a blob, and a six-point flare wanted 0.45). Use current native `create_texture` presets when suitable; this skill does not include a separate arbitrary-artwork generator.
 - **Star cut-outs:** multiply them by a radial mask, or they go grey at partial alpha.
-- **New shapes:** use the available image-generation or native asset workflow according to its instructions. Judge the result at actual display size before importing multiple variants.
-- **Importing through MCP:** on 0.9.50 prefer `sourcePath`, with `folderGrantId` when needed for local access. If inline data is necessary, encode and transfer it programmatically; never manually transcribe base64. Verify the imported dimensions and appearance and any returned byte/fingerprint fields against their documented meaning.
-- **Format troubleshooting:** the pack reported one 210×670 lossless WebP causing a lost capture context, with a palette PNG working instead. Isolate the asset and test a conversion if this reproduces; one file is not evidence that all lossless WebP is unsupported.
+- **New shapes:** use the available image-generation or native asset workflow according to its instructions. Shapes that generators get wrong, such as a droplet or a rounded box with a smoothstep falloff, take about a dozen lines of procedural pixel code. Judge the result at actual display size before importing multiple variants.
+- **Importing through MCP:** on 0.9.59 `import_asset` accepts a data URL, remote URL, inline data or `sourcePath`. With `sourcePath`, pass a `folderGrantId` from `choose_asset_folder` for a user-approved folder; without a grant, paths resolve under the server's `SLOTFX_MCP_ASSET_ROOTS`. `sourcePath` was the preferred route on 0.9.50. Encode any data URL programmatically (a programmatically encoded PNG data URL imported fine on 0.9.59); never manually transcribe base64, and no payload-size target is needed. Verify the imported dimensions and appearance and any returned byte/fingerprint fields against their documented meaning.
+- **Format troubleshooting:** the pack reported one 210×670 lossless (VP8L) WebP making every render that included it fail with "capture context was lost", while a 64-colour palette PNG of the same image rendered fine. Isolate the asset and test a conversion if this reproduces; one file is not evidence that all lossless WebP is unsupported.
 
 ## Verify
 

@@ -1,6 +1,6 @@
 # Reveal recipes and independent logo motion
 
-These concepts were built and visually reviewed in earlier local logo work. Times describe those examples, not a required template. The source logo had an emblem and two lines of text; adapt the parts to the current artwork.
+These concepts were built and visually reviewed in earlier local logo work on SlotVFX 0.9.49 (2026-09-26). Times describe those examples, not a required template. The source logo had an emblem and two lines of text; adapt the parts to the current artwork.
 
 ## Motion concepts
 

@@ -46,6 +46,8 @@ Write one motion function per reel, sample it, and push linear keys.
 | Landing (the "slight shake") | 38 px overshoot, then a damped spring (period 0.13 s, decay 0.075 s, about 0.36 s), plus a small sideways shake |
 | Teased reel | cruises at 6,000 px/s, then decelerates as (1 − u)² over 1.5 s. It lands about 2.2 s after reel 4, with a 22 px overshoot and a heavier spring (0.16 s / 0.085 s). |
 
+[Motion craft](../../slot-vfx-motion-craft/SKILL.md) converts this period/decay form to a damping ratio (about ζ 0.27 for the landing spring) and can generate the keys.
+
 **Wraps need a guard key before 0.9.48.** A copy wraps to the top with a **step** key. Before 0.9.48 a step key also eased the segment *arriving* at it, so a long linear run into a wrap stopped being linear. That left a copy 664 px ahead of its path and an empty cell. 0.9.48 fixed it: the arriving segment follows the chord.
 - **On older builds:** add a linear key 1.2 ms before every step key, on the line.
 - **Check:** measure `contentBounds` of the isolated strip mid-spin against the linear path.
@@ -155,8 +157,8 @@ Run it from the second-to-last stop until the teased reel lands, about 2.2 s:
   - `reorder_layers`: 100 items per call;
   - `set_timeline_keyframes`: 200 keys per call.
 - **Rewriting tracks:** delete the old keys by their exact times (`timeMode: "exact"`) before writing new ones. A set only replaces keys at matching times.
-- **Thousands of keys:** use ordered, resumable batches and sequential uploads by default. Use agents only when delegation is authorized and writes are independent. Compare keyframe counts and representative values with the generator.
-- **Saves:** checkpoint substantial edits and save completed stages. After a crash, compare reopened state with available saved data/checkpoints before overwriting anything. A cloud-revision comparison applies only if that service is available.
+- **Thousands of keys:** use ordered, resumable batches and sequential uploads by default. Use separate agents only when delegation is authorized and their timelines don't overlap, such as one agent per timeline. Compare keyframe counts and representative values with the generator.
+- **Saves:** checkpoint substantial edits and save completed stages. After a crash, compare the reopened state (for example `get_editor_state.lastModified`) with available saved data/checkpoints before overwriting anything; before 0.9.48 a crash's Retry could reopen an older copy. A cloud-revision comparison applies only if that service is available.
 
 ## 11. Verify
 
