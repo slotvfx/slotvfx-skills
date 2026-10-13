@@ -51,6 +51,14 @@ Tested schema limits: 25 initial feature values per particle, 100 entries per la
 
 ## Measure and preserve
 
+Keep verification claims separate:
+
+- **Configuration checked:** readback confirms intended values, clip membership and layer relationships. Tool success or particle counts alone do not establish appearance.
+- **Editor visually checked:** observed natural playback over the real art at the intended display size. Name any visible issue or phase not inspected; a screenshot cannot verify a loop seam or continuous travel by itself.
+- **Runtime tested:** exercised the actual exported target and the relevant instance count, aiming, stop/skip or cleanup behavior. Editor FPS and an export receipt do not establish this.
+
+Use these distinctions in a concise handoff when material; do not create a separate report for every tweak. Report unverified claims as untested. If a requested check is blocked, say what remains instead of substituting a successful property write as evidence.
+
 Review representative times through natural playback in SlotVFX. Use bounded `render_layout` captures for a particular diagnostic or an explicitly requested comparison. For diagnostics, `includeImage: false` provides particle counts and bounds. Bounds need a transparent render; use the real layout separately to judge placement and readability. Frame generously before concluding nothing drew.
 
 Counts and bounds diagnose activity and clipping. To verify unchanged appearance, compare decoded pixels or actual images under matching seed/time/settings; compressed image byte length is not an equality test. Check entry, peak, tail and any loop seam.

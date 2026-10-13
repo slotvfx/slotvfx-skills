@@ -56,6 +56,8 @@ Runtime source, editable .slotvfx project and rendered video are different deliv
 
 These routes support the 19 skills in this distribution: five workflow entrypoints plus 14 specialists, linked references and optional recording helpers. Load only the relevant installed sibling skills for the request. Current user instructions, installed schemas, readback and actual results take precedence over historical examples. Tool availability still depends on a separate local MCP connection; host approvals and native licensing/access remain in effect.
 
+For a new or rejected visual direction, apply the [visual-direction checkpoint](../../slot-vfx-effect-pack/SKILL.md#establish-a-visual-direction) before extending it into a pack. Tie each layer to the brief and verify the representative effect at player scale. Successful tool calls establish an edit; appearance requires observed playback, and runtime claims require target testing. This adds self-review, not an automatic user-approval gate.
+
 ## Authoring checks
 
 Keep snapshots of affected tracks, nested objects and memberships before substantial edits. `includedLayerIds` replaces a full list; preserve unrelated entries. Exact-time key writes do not erase keys at other times: read the old track, remove only the intended old times, then upload ordered batches below current limits. Compare values and times as well as counts. A cloud checkpoint is not a local backup; use the existing local project/undo route or an authorized saved copy.

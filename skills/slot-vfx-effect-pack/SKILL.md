@@ -17,13 +17,21 @@ Map cell centres, pitch, reel window, logo, badges and event anchors. Check plac
 
 Agree only missing decisions that materially affect the result. Infer reasonable styling and timing from the existing project; do not require an approval at every stage.
 
+## Establish a visual direction
+
+Before authoring, connect the effect's gameplay purpose to its silhouette/coverage, material and motion, contrast over the real art, and entry/peak/sustain/exit timing. A brief sentence per effect is enough; use existing task notes rather than creating a separate design document. Give each layer a visible job, and add support only when it improves that job.
+
+For a new pack or a rejected visual direction, finish and inspect one representative effect at player scale before expanding that treatment across the pack. Resolve weak visibility, muddy shape or unsuitable motion there first. This is a self-review checkpoint, not a new user-approval requirement; follow any review boundary the user explicitly requested.
+
+Reusable shapes can support different mechanics when their silhouettes, motion, timing and placement differ meaningfully. Recoloring the same burst is insufficient when the mechanics need distinct feedback. Preserve intentional continuity between connected events, such as a projectile and its arrival or a transition and the ambience it reveals. Use approved references when available; a named preset alone does not establish a visual direction.
+
 ## Assets and editable structure
 
 Reuse suitable project assets first. Generate a new texture only when it improves the requested look, using the available image workflow and its instructions. Simple readable cores often work better than detailed sprites at player scale.
 
 - Light textures such as glows, rings, streaks and dots can use white RGB with shape in alpha and color from the layer ramp.
 - Painted solids can retain their RGB shading with a neutral ramp that fades alpha. Do not wash out approved artwork to follow a universal white-texture rule.
-- Size by visible core and intended display size. A 32–128 px texture is a useful starting point for small marks, not a universal limit.
+- Size by visible core and intended display size. A 32–128 px texture is a useful starting point for small marks, not a universal limit. Crop excess transparent padding before import/packing while retaining needed antialiasing, filter bleed and consistent frame pivots.
 - Preserve editable source or generation settings when actually used. A texture's alpha shape changes the mark; compare substitutions instead of treating them as brightness adjustments.
 
 On 0.9.50, prefer `import_asset` with `sourcePath` and, when needed, a granted `folderGrantId`. Without a grant, paths resolve on the MCP server under its allowed asset roots. If inline data is necessary, encode and transfer it programmatically; never transcribe base64 by hand or impose an arbitrary 2 KB payload target.
@@ -34,7 +42,7 @@ Use one clearly named group and clip per independently triggered effect. Include
 
 Start with one strong readable element, then add supporting accents. For an outline treatment, preserve symbol readability; for a requested full-column highlight, provide the intended interior coverage. Do not turn every effect into a frame because an earlier project preferred frames.
 
-Use small moving marks for rhythm and a restrained larger sprite for a continuous body where appropriate. Either can bleach bright art if additive intensity is excessive. Set particle caps deliberately, especially for effects repeated on many cells.
+Use small moving marks for rhythm and a restrained larger sprite for a continuous body where appropriate. Either can bleach bright art if additive intensity is excessive. Choose blending by material: solid foam or fragments may need normal blending to remain visible over bright art; supporting light can use additive blending. A wash intended to conceal a scene change needs actual coverage, not just brightness. Verify the choice over the real art. Set particle caps deliberately, especially for effects repeated on many cells; include supporting layers and followers in the total.
 
 Even coverage usually depends on spawn geometry. Extend a spawn band beyond the visible area when that keeps falloff outside it; increasing speed can instead create unwanted sideways drift. For static or nearly static shapes, a textured sprite may be cheaper and cleaner than dozens of particles.
 
@@ -46,7 +54,7 @@ For specific mechanics, read only the relevant companion skill: [recipes](../slo
 
 ## Verify the authored result
 
-Preview onset, peak, middle and tail at player scale on the actual board. Use render offsets/overrides to explore placements without committing unnecessary edits. Check clear silhouette, intended coverage, readable symbols, correct layer order and no clipping.
+Inspect natural playback of onset, peak, sustain where present, and exit at player scale on the actual board. For mobile game effects, include a phone-sized view; a zoomed-in editor view is insufficient. Check clear silhouette, intended coverage, readable symbols/amounts, correct layer order, clipping, and the intended distinction from adjacent effects. If any of these fail, revise the composition before expanding the pack or calling the look ready. Use bounded captures or render offsets/overrides for specific placement questions; still frames alone do not establish motion timing or loop continuity.
 
 Estimate lifetime from timing settings, then measure beyond the expected end. Driver-death followers and variance can invalidate a simple sum. Read live counts and inspect frames until a one-shot finishes, or until a hold reaches its expected sustained behavior. Recheck after changing supposedly vestigial fields too.
 
