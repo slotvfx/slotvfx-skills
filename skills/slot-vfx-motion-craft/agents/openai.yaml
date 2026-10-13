@@ -1,0 +1,4 @@
+interface:
+  display_name: "SlotVFX Motion Craft"
+  short_description: "Write eases, springs, staggers and beats as exact keys"
+  default_prompt: "Use $slot-vfx-motion-craft to plan and key the motion for this SlotVFX effect."
