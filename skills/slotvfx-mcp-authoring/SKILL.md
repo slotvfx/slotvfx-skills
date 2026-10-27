@@ -11,6 +11,8 @@ Inspect the current project, relevant entities and timelines before editing. Cur
 
 This skill adapts the supplied 0.9.50 pack. The installed 0.9.50 MCP schema was checked on 2026-09-26; older behavioral observations below came from the pack and require reproduction when material. Prefer current schemas and actual frames over historical assumptions.
 
+To add or edit Spine animations, use `slotfx_get_spine_rig`, `slotfx_get_spine_animation`, `slotfx_propose_spine_animation` and `slotfx_preview_spine_animation` with `slotfx://authoring-guide/spine-animation`; the [Spine skill](../spine-vfx/SKILL.md) covers the flow. If those tools are missing, ask the user to update SlotVFX rather than editing skeleton JSON.
+
 ## Discover features and read back writes
 
 Use `find_features` (a plain-language query works) for a feature ID, then `get_feature_schema` for its shape. Registry IDs can differ from stored paths: `particle.subEmitter.trailSpacing` writes `config.subEmitterTrailSpacing`. A rejected patch's error lists every valid ID; search that list rather than guessing. Inspect tool warnings as well as success flags.

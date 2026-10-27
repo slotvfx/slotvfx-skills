@@ -17,3 +17,24 @@ Read [workflow routes and Spine verification caveats](references/workflows.md) f
 - Spine-file export, particle-to-Spine bake and FX plate export: these have editor bake/export paths; no dedicated MCP tool currently completes them. MCP can prepare supported properties. Finish through the existing UI when available and authorized, or report the exact manual step.
 
 Keep source skeletons/atlases and original artwork intact. Confirm the user's right to use the assets and runtime license requirements when selecting a delivery. Do not infer general Spine runtime parity from one successful editor render.
+
+## Add or edit Spine animations
+
+These tools exist only in SlotVFX builds that ship them. If `slotfx_get_spine_rig` is not in the tool list, tell the user to update SlotVFX to the latest release. Do not hand-edit the skeleton JSON instead.
+
+Read `slotfx://authoring-guide/spine-animation` first, then:
+
+1. `slotfx_get_spine_rig`: bones, slots, constraints, events, mesh attachments and the timeline types this rig's Spine version has.
+2. `slotfx_get_spine_animation`: the keys of the animation you start from, usually the idle.
+3. `slotfx_propose_spine_animation`: a new or edited animation as ops. They are checked against the rig; the proposal waits on the layer and changes nothing yet.
+4. `slotfx_preview_spine_animation`: key frames posed by the layer's own Spine runtime. Fix what reads wrong and propose again.
+
+The animator applies a proposal from the "AI animations" banner on the Spine layer (Preview, Apply, Discard); Apply is one undo step. No MCP tool applies it.
+
+Keys you can write: bone, slot and constraint timelines; draw order (`moveSlot`, `setDrawOrder`, `resetDrawOrder`); deform on meshes (`displaceDeform` first, then `blendDeform`, `scaleDeform` or `copyKeys`, raw offsets last); sequence frames (Spine 4.1+); dark colour on slots set up with one; inherit modes (Spine 4.2+). A key type the rig's version lacks is refused.
+
+Craft: start and end on the idle pose. Build an action as anticipation, strike, overshoot, recovery. To make an animation read differently, change the pose and silhouette, not small secondary parts.
+
+To retarget an animation between rigs, `slotfx_propose_spine_mapping` proposes a bone mapping; the animator reviews and applies it in Retarget Animation.
+
+SlotVFX does not include a Spine license. To export Spine animations or use the Spine Runtimes in their products, users need their own Spine license from Esoteric Software.
