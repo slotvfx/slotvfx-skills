@@ -148,7 +148,7 @@ For keyed layers, give each layer a different whole number of cycles per clip, s
 
 ## 10. Spine characters
 
-Keying bones on a Spine character follows the same eases and beats, plus character rules: block poses before curves, give every bone its own curve, change the silhouette so a new animation doesn't read as an existing one, uneven timing, overlap and follow-through down bone chains, arcs from rotation, planted contacts, moving holds and clean cycles. Read [Spine character motion](references/spine-character-motion.md) before writing keys for a Spine animation; `scripts/motion_keys.py chain` writes the overlap down a chain.
+Keying bones on a Spine character follows the same eases and beats, plus character rules: state the action in one sentence, block poses before curves, make it read before any VFX, give every bone its own curve, change the silhouette so a new animation doesn't read as an existing one, uneven timing, overlap and follow-through down bone chains, arcs from rotation, planted contacts, moving holds and clean cycles. Read [Spine character motion](references/spine-character-motion.md) before writing keys for a Spine animation; `scripts/motion_keys.py chain` writes the overlap down a chain.
 
 ## Script
 
