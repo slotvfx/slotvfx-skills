@@ -1,6 +1,6 @@
 ---
 name: slot-vfx-motion-craft
-description: Write how a SlotVFX effect moves — eases, springs, scale pops, staggers, beats, win escalation, loops — as exact timeline keys. Use with the build skills whenever something animates.
+description: Write how a SlotVFX effect or Spine character moves — eases, springs, scale pops, staggers, beats, win escalation, loops, overlap down bone chains — as exact keys. Use with the build skills whenever something animates.
 ---
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.
@@ -146,6 +146,10 @@ For keyed layers, give each layer a different whole number of cycles per clip, s
 - Read back keys with `get_timeline` and compare their count with what the script generated, as [slotvfx-mcp-authoring](../slotvfx-mcp-authoring/SKILL.md) describes.
 - Report which numbers you measured and which you judged by eye.
 
+## 10. Spine characters
+
+Keying bones on a Spine character follows the same eases and beats, plus character rules: block poses before curves, give every bone its own curve, change the silhouette so a new animation doesn't read as an existing one, uneven timing, overlap and follow-through down bone chains, arcs from rotation, planted contacts, moving holds and clean cycles. Read [Spine character motion](references/spine-character-motion.md) before writing keys for a Spine animation; `scripts/motion_keys.py chain` writes the overlap down a chain.
+
 ## Script
 
-[`scripts/motion_keys.py`](scripts/motion_keys.py) (Python 3, standard library only) writes the keys and tables used above; run `python3 scripts/motion_keys.py -h`. Each key subcommand prints JSON batches of up to 180 keys for `slotfx_set_timeline_keyframes`; pass each batch unchanged and read the track back. `stagger` prints a delay grid and a JSON list. The ease beziers are the common easings.net approximations under GSAP's names; the springs are the closed-form damped-oscillator solution, so the same arguments always give the same keys.
+[`scripts/motion_keys.py`](scripts/motion_keys.py) (Python 3, standard library only) writes the keys and tables used above; run `python3 scripts/motion_keys.py -h`. Each key subcommand prints JSON batches of up to 180 keys for `slotfx_set_timeline_keyframes`; pass each batch unchanged and read the track back. `stagger` prints a delay grid and a JSON list. `chain` prints Spine-style rotate keys per bone. The ease beziers are the common easings.net approximations under GSAP's names; the springs are the closed-form damped-oscillator solution, so the same arguments always give the same keys.

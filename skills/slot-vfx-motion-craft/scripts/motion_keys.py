@@ -15,6 +15,10 @@ becomes a handful of fitted bezier keys.
            motion_keys.py spring ... --period 0.13 --decay 0.075   (spin-showcase landing)
   stagger  per-cell delays for a rows x cols board
            motion_keys.py stagger --rows 3 --cols 5 --origin center --amount 0.3
+  chain    overlap and follow-through down a Spine bone chain from the lead bone's keys
+           motion_keys.py chain --bones hip,tail1,tail2,tail3 \
+               --keys "0:0,0.25:-12,0.6:25:power2.out,1.0:0" --ease power2.inOut \
+               --lag 0.1 --gain 1.2 --overshoot 0.15 [--loop 1.0]
 
 --log interpolates in log space (for scale): equal ratios per frame instead of
 equal steps, so a pop does not look like it stalls as it grows.
@@ -205,6 +209,69 @@ def cmd_stagger(a):
         print('  '.join(f"{delay[(r, c)]:5.3f}" if (r, c) in delay else '   - ' for c in range(C)))
     print(json.dumps([{"row": r, "col": c, "delay": delay[(r, c)]} for (r, c) in sorted(delay)]))
 
+def parse_chain_keys(text, default_ease):
+    keys = []
+    for part in text.split(','):
+        bits = part.strip().split(':')
+        if len(bits) not in (2, 3): sys.exit(f'bad key "{part}": use time:value or time:value:ease')
+        ease = bits[2] if len(bits) == 3 else default_ease
+        if ease not in EASES: sys.exit(f'unknown ease "{ease}"')
+        keys.append([float(bits[0]), float(bits[1]), ease])
+    keys.sort(key=lambda k: k[0])
+    if len(keys) < 2: sys.exit('--keys needs at least two keys')
+    return keys
+
+def spine_curve(t0, v0, t1, v1, ease):
+    """Spine 4.x JSON bezier: absolute [cx1, cy1, cx2, cy2] for the segment leaving this key."""
+    x1, y1, x2, y2 = EASES[ease]
+    return [round(t0 + x1 * (t1 - t0), 5), round(v0 + y1 * (v1 - v0), 4),
+            round(t0 + x2 * (t1 - t0), 5), round(v0 + y2 * (v1 - v0), 4)]
+
+def cmd_chain(a):
+    """Each level follows its parent `lag` seconds later and `gain` times as far.
+    Rotate values are Spine timeline values (added to the setup pose)."""
+    lead = parse_chain_keys(a.keys, a.ease)
+    bones = [b.strip() for b in a.bones.split(',') if b.strip()]
+    out = {}
+    for level, bone in enumerate(bones):
+        delay, scale = level * a.lag, a.gain ** level
+        ks = [[t + delay, v * scale, e] for t, v, e in lead]
+        if level and a.overshoot and a.loop is None:
+            # follow-through: past the final pose, then settle; grows down the chain
+            (tp, vp, _), (te, ve, ee) = ks[-2], ks[-1]
+            # the child carries on past the end pose instead of stopping on it, then swings back
+            over = ve + (ve - vp) * a.overshoot * level
+            ks[-1] = [te, over, 'sine.inOut']
+            ks.append([te + a.lag * 2.5, ve, ee])
+        if a.loop is not None:
+            L = a.loop
+            if abs(lead[-1][0] - lead[0][0] - L) > 1e-6 or abs(lead[-1][1] - lead[0][1]) > 1e-6:
+                sys.exit('--loop needs lead keys that start at 0 and end at the loop length with the same value')
+            base = [k for k in ks[:-1]]                       # one cycle, last key duplicates the first
+            wrapped = sorted(([t % L, v, e] for t, v, e in base), key=lambda k: k[0])
+            # value at time 0 on the wrapped cycle: interpolate between last wrapped key and first + L
+            first, last = wrapped[0], wrapped[-1]
+            if first[0] > 1e-9:
+                span = first[0] + L - last[0]
+                u = (L - last[0]) / span
+                v0 = last[1] + (first[1] - last[1]) * bezier_y(EASES[last[2]], u)
+                wrapped.insert(0, [0.0, v0, last[2]])
+                wrapped.append([L, v0, last[2]])
+            else:
+                wrapped.append([L, first[1], first[2]])
+            ks = wrapped
+        rows = []
+        for i, (t, v, e) in enumerate(ks):
+            row = {"time": round(t, 5), "value": round(v, 4)}
+            if i + 1 < len(ks) and e != 'linear':
+                row["curve"] = spine_curve(t, v, ks[i + 1][0], ks[i + 1][1], e)
+            rows.append(row)
+        out[bone] = {"rotate": rows}
+        print(f"{bone}: delay {delay:.3f}s, x{scale:.2f}, {len(rows)} keys", file=sys.stderr)
+    if a.loop is not None:
+        print('loop: wrapped keys at 0 and the loop length are approximate where a segment was split; check the seam', file=sys.stderr)
+    print(json.dumps({"bones": out}, separators=(',', ':')).replace('{"time"', '\n  {"time"'))
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -234,10 +301,18 @@ def main():
     st.add_argument('--each', type=float, help='or seconds per unit of distance')
     st.add_argument('--ease', choices=sorted(EASES), default='linear', help='shape of the spread')
     st.add_argument('--seed', type=int, default=1)
+    sc = sub.add_parser('chain', help='overlap down a bone chain')
+    sc.add_argument('--bones', required=True, help='lead bone first, e.g. hip,tail1,tail2')
+    sc.add_argument('--keys', required=True, help='lead bone rotate keys: time:value[:ease of the segment starting here],...')
+    sc.add_argument('--ease', choices=sorted(EASES), default='power2.inOut', help='default ease per segment')
+    sc.add_argument('--lag', type=float, default=0.1, help='seconds each level lags its parent (2-4 frames)')
+    sc.add_argument('--gain', type=float, default=1.15, help='rotation multiplier per level')
+    sc.add_argument('--overshoot', type=float, default=0.0, help='follow-through past the final pose, fraction per level')
+    sc.add_argument('--loop', type=float, help='cycle length: wrap shifted keys so the cycle stays seamless')
     a = p.parse_args()
     if a.cmd == 'stagger' and (a.amount is None) == (a.each is None):
         p.error('stagger needs exactly one of --amount or --each')
-    {'ease': cmd_ease, 'spring': cmd_spring, 'stagger': cmd_stagger}[a.cmd](a)
+    {'ease': cmd_ease, 'spring': cmd_spring, 'stagger': cmd_stagger, 'chain': cmd_chain}[a.cmd](a)
 
 if __name__ == '__main__':
     main()
