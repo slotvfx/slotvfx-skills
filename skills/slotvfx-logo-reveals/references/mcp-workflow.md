@@ -9,7 +9,8 @@ Use the available SlotVFX MCP tools. If absent from tool discovery but the deskt
 After resolving the current adapter module, its tested call pattern was:
 
 ```javascript
-const client = createAutoDiscoveringSlotfxBridgeClient({ argv: [], env: process.env });
+// The adapter finds the running app's local bridge on its own.
+const client = createAutoDiscoveringSlotfxBridgeClient({ argv: [] });
 const result = await callSlotfxTool(client, toolName, args);
 const data = result.structuredContent || result;
 if (result.isError || data.ok === false) throw new Error(data.message || toolName);

@@ -3,7 +3,7 @@ name: slotvfx-mcp-authoring
 description: "Author and refine SlotVFX projects through MCP: discover effect parameters, preserve existing work, manage clip membership and keyframes, read back writes, and verify changes. Use alongside the relevant visual-design skill."
 ---
 
-Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.
+Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request. If no `slotfx_` tools are available at all, SlotVFX never connected to Claude Code; say so plainly instead of attempting the work. On macOS the plugin needs Node.js: tell the user to install the LTS version from https://nodejs.org, restart Claude Code, and open SlotVFX with Connect AI turned on. If Node.js is already installed, ask them to run `/mcp` and share the SlotVFX error. On Windows, ask them to check that SlotVFX Desktop 0.9.64 or newer is installed, then restart Claude Code.
 
 # Authoring in SlotVFX through MCP
 

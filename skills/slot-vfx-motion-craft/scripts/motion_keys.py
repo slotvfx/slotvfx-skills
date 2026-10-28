@@ -15,10 +15,16 @@ becomes a handful of fitted bezier keys.
            motion_keys.py spring ... --period 0.13 --decay 0.075   (spin-showcase landing)
   stagger  per-cell delays for a rows x cols board
            motion_keys.py stagger --rows 3 --cols 5 --origin center --amount 0.3
-  chain    overlap and follow-through down a Spine bone chain from the lead bone's keys
-           motion_keys.py chain --bones hip,tail1,tail2,tail3 \
+  chain    overlap and follow-through down a loose Spine chain (tail, hair, cape) from the
+           lead bone's keys; not for spines or limbs that carry weight
+           motion_keys.py chain --bones tail1,tail2,tail3,tail4 \
                --keys "0:0,0.25:-12,0.6:25:power2.out,1.0:0" --ease power2.inOut \
-               --lag 0.1 --gain 1.2 --overshoot 0.15 [--loop 1.0]
+               --lag 0.1 --gain 1.2 --overshoot 0.15 [--loop 1.0] [--base tail1=-5,tail2=12,...]
+  wave     a looping layer (breath, sway) on many Spine channels, each with its own amount,
+           delay and period, wrapped exactly at the seam
+           motion_keys.py wave --period 3.333 --shape breath \
+               --channels "hip.y:1.2:0,chest.x:2.4:0.1,shoulder.x:1.4:0.167,neck.rotate:-0.5:0.2" \
+               --base "hip.x=-11.97,hip.y=-23.15,neck.rotate=3.78"
 
 --log interpolates in log space (for scale): equal ratios per frame instead of
 equal steps, so a pop does not look like it stalls as it grows.
@@ -37,6 +43,8 @@ EASES = {  # cubic-bezier(x1, y1, x2, y2); GSAP names, easings.net curves
     'expo.in': (.7, 0, .84, 0), 'expo.out': (.16, 1, .3, 1), 'expo.inOut': (.87, 0, .13, 1),
     'circ.in': (.55, 0, 1, .45), 'circ.out': (0, .55, .45, 1), 'circ.inOut': (.85, 0, .15, 1),
     'back.in': (.36, 0, .66, -.56), 'back.out': (.34, 1.56, .64, 1), 'back.inOut': (.68, -.6, .32, 1.6),
+    # exhale: leaves the top of the breath gently, drops quickly, then settles slowly at the bottom
+    'breath.out': (.3, 0, .2, 1),
 }
 
 def bezier_y(p, x):
@@ -241,11 +249,56 @@ def split_points(P, t):
     f = L(d, e)
     return [P[0], a, d, f], [f, e, c, P[3]]
 
+def spine_rows(ks, loop=None):
+    """Spine rotate-style rows {time, value, curve:[cx1,cy1,cx2,cy2]} from [time, value, ease] keys.
+    With loop L and keys running from some delay to delay + L, the cycle is rotated to start at 0
+    and the segment that crosses the seam is split exactly."""
+    segs = [seg_points(t0, v0, t1, v1, e0) if e0 != 'linear' else None
+            for (t0, v0, e0), (t1, v1, _) in zip(ks, ks[1:])]
+    if loop is not None and ks[0][0] % loop > 1e-9:
+        L, shift = loop, ks[0][0] - ks[0][0] % loop
+        pts = []
+        for (t0, v0, e0), (t1, v1, _), P in zip(ks, ks[1:], segs):
+            P = P or [(t0, v0), (t0, v0), (t1, v1), (t1, v1)]
+            pts.append([(x - shift, y) for x, y in P])
+        pieces = []
+        for P in pts:
+            if P[0][0] < L < P[3][0] - 1e-9:
+                A, B = split_points(P, L)
+                pieces += [A, B]
+            else:
+                pieces.append(P)
+        pieces = [[((x - L) if P[0][0] >= L - 1e-9 else x, y) for x, y in P] for P in pieces]
+        pieces.sort(key=lambda P: P[0][0])
+        rows = [{"time": round(P[0][0], 5) + 0.0, "value": round(P[0][1], 4),
+                 "curve": [round(c, 5 if i % 2 == 0 else 4) for pt in P[1:3] for i, c in enumerate(pt)]}
+                for P in pieces]
+        rows.append({"time": round(L, 5), "value": rows[0]["value"]})
+        return rows
+    rows = []
+    for i, (t, v, e) in enumerate(ks):
+        row = {"time": round(t, 5), "value": round(v, 4)}
+        if i < len(segs) and segs[i]:
+            row["curve"] = [round(c, 5 if j % 2 == 0 else 4) for pt in segs[i][1:3] for j, c in enumerate(pt)]
+        rows.append(row)
+    return rows
+
 def cmd_chain(a):
     """Each level samples its parent `lag` seconds later and swings `gain` times as far.
     Rotate values are Spine timeline values (added to the setup pose)."""
     lead = parse_chain_keys(a.keys, a.ease)
     bones = [b.strip() for b in a.bones.split(',') if b.strip()]
+    base = {}
+    if a.base:
+        parts = [p.strip() for p in a.base.split(',') if p.strip()]
+        if all('=' in p for p in parts):
+            base = {k.strip(): float(v) for k, v in (p.split('=', 1) for p in parts)}
+            unknown = set(base) - set(bones)
+            if unknown: sys.exit(f'--base names bones not in --bones: {", ".join(sorted(unknown))}')
+        elif len(parts) == len(bones):
+            base = dict(zip(bones, map(float, parts)))
+        else:
+            sys.exit('--base: give bone=angle pairs, or one angle per bone in --bones order')
     if a.loop is not None:
         if abs(lead[0][0]) > 1e-9 or abs(lead[-1][0] - a.loop) > 1e-6 or abs(lead[-1][1] - lead[0][1]) > 1e-6:
             sys.exit('--loop needs lead keys from 0 to the loop length, ending on the starting value')
@@ -260,37 +313,84 @@ def cmd_chain(a):
             (tp, vp, _), (te, ve, ee) = ks[-2], ks[-1]
             ks[-1] = [te, ve + (ve - vp) * a.overshoot * level, 'sine.inOut']
             ks.append([te + a.lag * 2.5, ve, ee])
-        segs = [seg_points(t0, v0, t1, v1, e0) if e0 != 'linear' else None
-                for (t0, v0, e0), (t1, v1, _) in zip(ks, ks[1:])]
-        if a.loop is not None and delay % a.loop > 1e-9:
-            # rotate the cycle so it starts at 0 again; split the segment that crosses the seam exactly
-            L, shift = a.loop, delay - delay % a.loop
-            pts = []
-            for (t0, v0, e0), (t1, v1, _), P in zip(ks, ks[1:], segs):
-                P = P or [(t0, v0), (t0, v0), (t1, v1), (t1, v1)]
-                pts.append([(x - shift, y) for x, y in P])
-            pieces = []
-            for P in pts:
-                if P[0][0] < L < P[3][0] - 1e-9:
-                    A, B = split_points(P, L)
-                    pieces += [A, B]
-                else:
-                    pieces.append(P)
-            pieces = [[((x - L) if P[0][0] >= L - 1e-9 else x, y) for x, y in P] for P in pieces]
-            pieces.sort(key=lambda P: P[0][0])
-            rows = [{"time": round(P[0][0], 5) + 0.0, "value": round(P[0][1], 4),
-                     "curve": [round(c, 5 if i % 2 == 0 else 4) for pt in P[1:3] for i, c in enumerate(pt)]}
-                    for P in pieces]
-            rows.append({"time": round(L, 5), "value": rows[0]["value"]})
-        else:
-            rows = []
-            for i, (t, v, e) in enumerate(ks):
-                row = {"time": round(t, 5), "value": round(v, 4)}
-                if i < len(segs) and segs[i]:
-                    row["curve"] = [round(c, 5 if j % 2 == 0 else 4) for pt in segs[i][1:3] for j, c in enumerate(pt)]
-                rows.append(row)
+        rows = spine_rows(ks, a.loop)
+        b = base.get(bone, 0.0)
+        if b:
+            for row in rows:
+                row["value"] = round(row["value"] + b, 4)
+                if "curve" in row:
+                    row["curve"][1] = round(row["curve"][1] + b, 4)
+                    row["curve"][3] = round(row["curve"][3] + b, 4)
         out[bone] = {"rotate": rows}
         print(f"{bone}: delay {delay:.3f}s, x{scale:.2f}, {len(rows)} keys", file=sys.stderr)
+    print(json.dumps({"bones": out}, separators=(',', ':')).replace('{"time"', '\n  {"time"'))
+
+SHAPES = {  # one cycle on [0, 1]: (phase, value 0..1, ease of the segment that starts there)
+    'breath': lambda r: [(0.0, 0.0, 'sine.inOut'), (r, 1.0, 'breath.out'), (1.0, 0.0, None)],
+    'sine': lambda r: [(0.0, 0.0, 'sine.inOut'), (0.5, 1.0, 'sine.inOut'), (1.0, 0.0, None)],
+}
+CHANNELS = {'rotate': ('rotate', 'value'), 'x': ('translate', 'x'), 'y': ('translate', 'y'),
+            'scaleX': ('scale', 'x'), 'scaleY': ('scale', 'y')}
+
+def cmd_wave(a):
+    """Each channel = base + amount * shape(time - delay), looping every --period * --cycles seconds.
+    Values are Spine timeline values: rotate and translate are added to the setup pose, scale multiplies it."""
+    L = a.period * a.cycles
+    base = {}
+    for part in filter(None, (p.strip() for p in (a.base or '').split(','))):
+        k, v = part.split('=', 1); base[k.strip()] = float(v)
+    chans = {}
+    for part in filter(None, (p.strip() for p in a.channels.split(','))):
+        bits = part.split(':')
+        if len(bits) < 2 or '.' not in bits[0]: sys.exit(f'bad channel "{part}": use bone.channel:amount[:delay[:period]]')
+        bone, ch = bits[0].rsplit('.', 1)
+        if ch not in CHANNELS: sys.exit(f'channel "{ch}": use rotate, x, y, scaleX or scaleY')
+        amt = float(bits[1]); delay = float(bits[2]) if len(bits) > 2 else 0.0
+        per = float(bits[3]) if len(bits) > 3 else a.period
+        n = L / per
+        if abs(n - round(n)) > 1e-6: sys.exit(f'{part}: its period {per} must fit a whole number of times into the loop {L}')
+        rest = base.get(f'{bone}.{ch}', 1.0 if ch.startswith('scale') else 0.0)
+        ks = []
+        for c in range(int(round(n))):
+            for ph, v, e in SHAPES[a.shape](a.rise):
+                if ks and ph == 0.0: continue
+                ks.append([delay + (c + ph) * per, rest + amt * v, e or 'sine.inOut'])
+        chans[(bone, ch)] = (spine_rows(ks, L), delay % L, per)
+    out = {}
+    for (bone, ch), (rows, delay, per) in chans.items():
+        tl, fld = CHANNELS[ch]
+        tls = out.setdefault(bone, {})
+        if tl == 'rotate':
+            tls['rotate'] = rows; continue
+        other = 'y' if fld == 'x' else 'x'
+        ochan = {'translate': {'x': 'x', 'y': 'y'}, 'scale': {'x': 'scaleX', 'y': 'scaleY'}}[tl][other]
+        partner = chans.get((bone, ochan))
+        if partner and (abs(partner[1] - delay) > 1e-9 or abs(partner[2] - per) > 1e-9):
+            # different timing on x and y: Spine 4.x splits them into translatex/translatey or scalex/scaley
+            tls[tl + fld] = rows
+            if fld == 'x': print(f'{bone}: {tl} x and y have different timing, written as {tl}x / {tl}y timelines '
+                                 '(give both the same delay and period to keep one timeline)', file=sys.stderr)
+            continue
+        merged = tls.setdefault(tl, [{"time": r["time"]} for r in rows])
+        orest = base.get(f'{bone}.{ochan}', 1.0 if tl == 'scale' else 0.0)
+        for m, r in zip(merged, rows):
+            m[fld] = r["value"]
+            m.setdefault(other, orest)
+            if "curve" in r:
+                cur = m.setdefault("curve", [None] * 8)
+                o = 0 if fld == 'x' else 4
+                cur[o:o + 4] = r["curve"]
+    for tls in out.values():
+        for tl in ('translate', 'scale'):
+            rows = tls.get(tl, [])
+            for m, nxt in zip(rows, rows[1:]):
+                if "curve" in m and None in m["curve"]:
+                    o = 0 if m["curve"][0] is None else 4      # the constant partner: flat handles on its value
+                    v = m['x' if o == 0 else 'y']; t0, t1 = m["time"], nxt["time"]
+                    m["curve"][o:o + 4] = [round(t0 + (t1 - t0) / 3, 5), v, round(t0 + 2 * (t1 - t0) / 3, 5), v]
+    for (bone, ch), (rows, delay, per) in sorted(chans.items()):
+        vals = [r["value"] for r in rows]
+        print(f'{bone}.{ch}: delay {delay:.3f}s, period {per:g}s, {min(vals):.4g}..{max(vals):.4g}, {len(rows)} keys', file=sys.stderr)
     print(json.dumps({"bones": out}, separators=(',', ':')).replace('{"time"', '\n  {"time"'))
 
 def main():
@@ -329,11 +429,25 @@ def main():
     sc.add_argument('--lag', type=float, default=0.1, help='seconds each level lags its parent (2-4 frames)')
     sc.add_argument('--gain', type=float, default=1.15, help='rotation multiplier per level')
     sc.add_argument('--overshoot', type=float, default=0.0, help='follow-through past the final pose, fraction per level')
+    sc.add_argument('--base', help="each bone's resting rotate value, added to its keys: "
+                    "bone=angle,... or one angle per bone (e.g. the idle's first pose); "
+                    "write --base=-22.9,3.8 when the list starts with a minus")
     sc.add_argument('--loop', type=float, help='cycle length: wrap delayed keys around the seam exactly, so the cycle stays seamless')
+    sw = sub.add_parser('wave', help='looping breath or sway layer on many channels')
+    sw.add_argument('--period', type=float, required=True, help='seconds per cycle (a breath: 2-4 s in games)')
+    sw.add_argument('--cycles', type=int, default=1, help='cycles per loop; the loop is period x cycles')
+    sw.add_argument('--shape', choices=sorted(SHAPES), default='breath',
+                    help='breath: slower inhale, quicker exhale, settle at the bottom; sine: even sway')
+    sw.add_argument('--rise', type=float, default=0.4, help='breath: share of the cycle spent inhaling')
+    sw.add_argument('--channels', required=True,
+                    help='bone.channel:amount[:delay[:period]],... channel = rotate|x|y|scaleX|scaleY; '
+                         'amount is the peak offset from the base; delay in seconds; period must divide the loop')
+    sw.add_argument('--base', help="bone.channel=value,... each channel's resting value (e.g. the idle's first pose); "
+                    'unset channels rest at 0 (scale at 1)')
     a = p.parse_args()
     if a.cmd == 'stagger' and (a.amount is None) == (a.each is None):
         p.error('stagger needs exactly one of --amount or --each')
-    {'ease': cmd_ease, 'spring': cmd_spring, 'stagger': cmd_stagger, 'chain': cmd_chain}[a.cmd](a)
+    {'ease': cmd_ease, 'spring': cmd_spring, 'stagger': cmd_stagger, 'chain': cmd_chain, 'wave': cmd_wave}[a.cmd](a)
 
 if __name__ == '__main__':
     main()
