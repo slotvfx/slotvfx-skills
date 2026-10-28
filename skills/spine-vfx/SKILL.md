@@ -22,14 +22,14 @@ Keep source skeletons/atlases and original artwork intact. Confirm the user's ri
 
 These tools exist only in SlotVFX builds that ship them. If `slotfx_get_spine_rig` is not in the tool list, tell the user to update SlotVFX to the latest release. Do not hand-edit the skeleton JSON instead.
 
-Read `slotfx://authoring-guide/spine-animation` first, then:
+Read the `slotfx://authoring-guide/spine-animation` resource first (or `slotfx_get_authoring_guide` with section `spine-animation` when resources are unavailable), then:
 
 1. `slotfx_get_spine_rig`: bones, slots, constraints, events, mesh attachments and the timeline types this rig's Spine version has.
 2. `slotfx_get_spine_animation`: the keys of the animation you start from, usually the idle.
-3. `slotfx_propose_spine_animation`: a new or edited animation as ops. They are checked against the rig; the proposal waits on the layer and changes nothing yet.
-4. `slotfx_preview_spine_animation`: key frames posed by the layer's own Spine runtime. Fix what reads wrong and propose again.
+3. `slotfx_propose_spine_animation`: a new or edited animation as ops. They are checked against the rig; the proposal waits on the layer and changes nothing yet. A key's `curve` is `"linear"`, `"stepped"`, `{bezier:[cx1,cy1,cx2,cy2]}` (fractions of the segment's time and value change) or `{points:[cx1,cy1,cx2,cy2]}` (seconds and values, 4.x rigs; on 3.x only where a fraction is exact). Handles outside the segment's times are refused.
+4. `slotfx_preview_spine_animation`: key frames posed by the layer's own Spine runtime. Fix what reads wrong and propose again. Sample times are clamped to the animation's duration, so it cannot show a second cycle: check a loop seam by comparing the poses at 0, just before the end and at the end.
 
-The animator applies a proposal from the "AI animations" banner on the Spine layer (Preview, Apply, Discard); Apply is one undo step. No MCP tool applies it.
+The animator applies a proposal from the "AI animations" banner on the Spine layer (Preview, Apply, Discard); Apply is one undo step. No MCP tool applies it. A new proposal for the same animation does not replace an older one, and no MCP tool discards a Spine proposal (`slotfx_discard_proposal` clears only semantic change proposals): ask the animator to discard stale ones in the banner.
 
 Keys you can write: bone, slot and constraint timelines; draw order (`moveSlot`, `setDrawOrder`, `resetDrawOrder`); deform on meshes (`displaceDeform` first, then `blendDeform`, `scaleDeform` or `copyKeys`, raw offsets last); sequence frames (Spine 4.1+); dark colour on slots set up with one; inherit modes (Spine 4.2+). A key type the rig's version lacks is refused.
 

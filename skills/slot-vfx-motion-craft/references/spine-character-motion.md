@@ -64,9 +64,9 @@ python3 scripts/motion_keys.py chain --bones hip,tail1,tail2,tail3 \
 
 - Each key is `time:value`, optionally `:ease` for the segment that starts at that key (otherwise `--ease`).
 - With `--overshoot`, don't also give the last segment an overshooting ease such as `back.out`: it double-bounces.
-- The followers end later than the lead (here 0.35 s for the first follower and 0.1 s more for each one after), so the animation gets longer. Check its duration, and that the end pose matches what the next animation expects.
+- The followers end later than the lead (here 0.35 s for the first follower and 0.1 s more for each one after), so the animation gets longer. Check its duration, and that the end pose matches what the next animation expects. In SlotVFX a `setDuration` op shorter than the last follower key is refused ("Keys run to … past the duration"); without one the duration is the last key. If you start from `copyFrom`, check the duration the proposal returns.
 - `--loop L` for cycles: the lead keys must run from 0 to L and end on the starting value. Delayed keys wrap round the seam, and the segment that crosses it is split exactly, so the cycle stays seamless. No overshoot in loops.
-- Output is Spine-style rotate keys per bone: `time`, `value`, and `curve` as absolute bezier handles `[cx1, cy1, cx2, cy2]` (the Spine 4.x JSON form). Convert them to the schema of the Spine animation tool you are using; don't guess its field names.
+- Output is Spine-style rotate keys per bone: `time`, `value`, and `curve` as absolute bezier handles `[cx1, cy1, cx2, cy2]` (the Spine 4.x JSON form). For `slotfx_propose_spine_animation` on a 4.x rig, keep `time` and `value` and wrap the curve as `curve: {points: [cx1, cy1, cx2, cy2]}`, in a `setKeys` op with target `{type: "bone", name, timeline: "rotate"}`. On a 3.x rig convert each curve to fractions of its segment, `{bezier: [(cx1 - t0) / dt, (cy1 - v0) / dv, (cx2 - t0) / dt, (cy2 - v0) / dv]}`; where the two keys have the same value (dv = 0) a curve that swings out and back cannot be written, so add a key at the swing. For other tools, check their schema rather than guessing field names.
 - It writes rotation only. For translate or scale on followers, apply the same idea by hand: delay and soften.
 
 ## 5. Arcs
@@ -107,4 +107,4 @@ Play it at normal speed and at gameplay size, at least two cycles, then ask:
 - Does it start and end cleanly against the animations it mixes with?
 - Try the whole thing 50% faster and 50% slower. If either looks better, the timing was wrong.
 
-Then show it in SlotVFX through the Spine animation proposal and preview. The user applies it from the editor's own review banner; don't look for a tool to apply it.
+Then show it in SlotVFX through the Spine animation proposal and preview. The preview samples only within the animation's duration, so check a loop's seam there by comparing the poses at 0, just before the end and at the end, and play two cycles in the editor's banner Preview. The user applies it from the editor's own review banner; don't look for a tool to apply it.
