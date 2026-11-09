@@ -17,6 +17,8 @@ Use the requested FPS and dimensions. Infer established preferences from the cur
 
 Capture `x`/`y`/`captureWidth`/`captureHeight` describe a world-space rectangle. Output `renderWidth`/`renderHeight` describe encoded pixels. Preserve aspect ratio and frame the full intended effect with margin; for example, a 1920×1560 capture of a 1920×1638 board encodes at 1330×1080 rather than being stretched. Editor zoom is not an export crop. Add letterboxing, a blurred background or a 16:9 composite only when appropriate to the requested delivery.
 
+MP4 is opaque H.264 with AAC sound; WebM keeps transparency (VP9, VP8 fallback) with Opus sound; `includeAudio: false` makes either video-only. Recording needs a paid export license.
+
 `set_recorder` settings persist on the device, not in the project. Pass per-job settings to `start_recording` so a take does not depend on stale global recorder settings. Use prewarm (`prewarmSeconds`; about 2 s put ambient particles on frame zero on an earlier build) only when the scene needs an established first-frame population; check support, since the pack reports scenarios ignore it.
 
 From 0.9.50, pass `timelineId` to record a named clip from a snapshot without switching the user's active editor clip, playback or settings. Each job captures a fixed project/settings snapshot at queue time (0.9.59), so later edits or clip switches do not change a queued take. Without `timelineId` and with no `stateScenarioId`, the recorder takes the active editing timeline, which was seen switching unexpectedly on an earlier build, most likely when a state was selected or previewed. For an ordinary clip, ensure no unintended state scenario is selected. Verify the returned source timeline/scenario (the `start_recording` reply includes `timelineId`/`stateScenarioId` from 0.9.47) and settings before trusting the take. On an older build requiring the active timeline, set it with `set_active_timeline`, capture, restore the original selection/playback and explain the visible limitation.
@@ -41,7 +43,7 @@ Recording after a clip ends may hold keys and continue some content: on an earli
 
 ## Retrieve the exact job safely
 
-Queue captures sequentially unless current tools support independent parallel jobs and the task benefits from them. Keep a manifest of timeline/scenario, settings, expected duration/frames, job ID, exact output path and completion state. The 0.9.50 queue has six slots including completed jobs; when it is full, `start_recording` fails with "The queue holds six exports."
+Queue captures sequentially unless current tools support independent parallel jobs and the task benefits from them. Keep a manifest of timeline/scenario, settings, expected duration/frames, job ID, exact output path and completion state. The desktop export queue has six slots, counting finished jobs and exports started in the editor; when it is full, `start_recording` fails with `EXPORT_QUEUE_FULL` (0.9.79).
 
 Poll `get_recording` with bounded waits and useful progress updates until `job.lifecycleState` is `completed`, and note its `byteLength`. `save_recording` opens the native Save As workflow; poll `job.saveState` until `saved`, `cancelled` or `failed`. A saved job can remain `state=ready` for retrieval. Use the dialog when that interaction is intended. For authorized direct retrieval into the workspace, use `read_recording` (0.9.59: base64 chunks, default 64 KiB, `length` up to 1 MiB), one call at a time:
 
@@ -54,7 +56,7 @@ Do not delete tool-output files or other jobs as a side effect of decoding. Afte
 
 ## Verify the video before combining
 
-Use `ffprobe` (with `-count_frames`) and decode checks for actual frame count, dimensions, frame timestamps, FPS, audio tracks and duration. Inspect representative frames and motion: onset, peak, tail, frames zero through three, both sides of loop seams, state changes and joins. A contact sheet helps: `ffmpeg -i in.mp4 -vf "select='not(mod(n\,15))',scale=330:-1,tile=6x5" -frames:v 1 sheet.png` tiles every 15th frame. Counts alone cannot detect a frozen second lap.
+Use `ffprobe` (with `-count_frames`) and decode checks for actual frame count, dimensions, frame timestamps, FPS, audio tracks and duration. Inspect representative frames and motion: onset, peak, tail, frames zero through three, both sides of loop seams, state changes and joins. A contact sheet helps: `ffmpeg -i in.mp4 -vf "select='not(mod(n\,15))',scale=330:-1,tile=6x5" -frames:v 1 sheet.png` tiles every 15th frame. Counts alone cannot detect a frozen second lap. For a take with sound, the finished job's `audioMix` reports `peakDbFS` and `clippedSamples`; gains are never normalized, so clipped samples above zero mean the mix clips.
 
 For a visually changing loop, compare matching phases across cycles and different phases within each cycle. A still-looking hold can be intentional; assess against the authored effect. If a build cannot capture multiple cycles correctly, capture one verified lap and repeat it only when that satisfies the user's request, explaining the assembly.
 

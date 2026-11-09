@@ -1,6 +1,6 @@
 # SlotVFX desktop workflow routes
 
-The SlotVFX local MCP adapter exposes the existing 137 editor tools without changing their schemas or results. The user's installed permissions determine which can be called. Discover current schemas rather than guessing parameters. The editable effect and its playback in SlotVFX are the primary result. These skills contain guidance only; a separately configured MCP client connects to the running app's token-protected local bridge.
+The SlotVFX local MCP server exposes the editor's own tools without changing their schemas or results: 148 on 0.9.79, fewer on older builds, so check the tool list rather than this guide. The user's installed permissions determine which can be called. Discover current schemas rather than guessing parameters. The editable effect and its playback in SlotVFX are the primary result. These skills contain guidance only; a separately configured MCP client connects to the running app's token-protected local bridge.
 
 | Goal | Route | Completion evidence |
 | --- | --- | --- |
@@ -8,9 +8,10 @@ The SlotVFX local MCP adapter exposes the existing 137 editor tools without chan
 | New project | create_project → poll get_app_state | matching operationId completed, then editorReady |
 | Existing project | list_projects → open_project → poll get_app_state | correct project identity; respect save/discard/cancel dialog |
 | Orient | get_project_summary → get_hierarchy → get_timeline → get_entity | exact layer/group/clip IDs and existing state |
-| Find a control | find_features → get_feature_schema | registered property, range, enum and runtime support |
-| Create | get_authoring_guide → create_particle_from_preset, create_entity, or create_group | dryRun where useful; returned IDs; explicit clip membership |
-| Revise | set_property, batch_set_properties, set_timeline_keyframes | read back affected values and unrelated nested fields; inspect warnings |
+| Find a control | find_features → get_feature_schema → focus_feature | registered property, range, enum and runtime support; focus_feature opens the panel and highlights the control for the user |
+| Create | get_authoring_guide → create_layers (many layers in one undo step, with clipIds), create_particle_from_preset, create_entity, create_path_from_preset or create_group | dryRun where useful; returned IDs; explicit clip membership |
+| Revise | set_property, batch_set_properties, set_timeline_keyframes, apply_motion_preset (from 0.9.78), move_effect, stagger_layers | read back affected values and unrelated nested fields; inspect warnings |
+| Check | check_particle_effect, check_spine_motion, check_spine_export | fix every FAIL and WARN row and run it again, then judge by eye: the numbers catch broken effects, not ugly ones |
 | Show in SlotVFX | get_editor_state → set_active_timeline if needed → focus_entity → play_timeline → get_editor_state | correct active clip, selected/framed effect, natural editor playback; clear clip/layer handoff |
 | Diagnose | render_layout or simulate_and_capture only for a specific question | bounded actual frames/counts/bounds and warnings; restore temporary inspection state |
 | Recover | list_audit_log, get_entity, get_timeline → undo/redo where applicable | inspect whether the interrupted edit applied before retrying |
@@ -38,7 +39,7 @@ For a temporary diagnostic, remember the prior active clip, selection, time/spee
 
 Use `slotfx_render_layout` only when an actual image helps answer a particular question, such as clipping, pose comparison or alignment. Prefer one well-framed image at the relevant time; a contact sheet is useful only when comparison requires it. Three frames do not demonstrate motion timing or loop continuity. Pass `imageOutput:"image"`, an explicit world-space frame and named timeline; bound width and times. Use diagnostic `includeImage:false` when counts/bounds suffice. Partial results and warnings must remain visible.
 
-When the user requests a video, use the established recorder workflow below and deliver an ordinary MP4/WebM to the requested destination. Preserve the chosen quality, framing and audio. A temporary chat video is a file operation and follows the user's file-saving instructions. Version 0.5.0 has no embedded viewer or `slotfx_preview_video` wrapper. Keep the existing editor/player as the viewing surface.
+When the user requests a video, use the established recorder workflow below and deliver an ordinary MP4/WebM to the requested destination. Preserve the chosen quality, framing and audio. A temporary chat video is a file operation and follows the user's file-saving instructions. There is no embedded viewer or `slotfx_preview_video` tool. Keep the existing editor/player as the viewing surface.
 
 A cooperative capture budget may return a partial strip. Report completed/requested counts and use `remainingTimes` for a deliberate follow-up. A single expensive GPU draw cannot be preempted by the budget. No automatic rerender loop. For requested images returned as resources, use read_artifact or render a smaller image.
 
@@ -50,7 +51,7 @@ Import with sourcePath only from an explicitly allowed asset root; choose_asset_
 
 ## Delivery
 
-Runtime source, editable .slotvfx project and rendered video are different deliverables. Confirm the requested target and destination. Current export_runtime writes project_data.json and diagnostics only; listed runtime scripts and external assets are planned artifacts, not delivered files. Use the editor Game Runtime Export for a full bundle, then inspect its actual contents. Use export_runtime diagnostics before writing files; use a fresh task-owned directory and overwrite:false. A successful export is not runtime parity: load and exercise the exported target for any parity claim. MP4/WebM recording requires job.lifecycleState=completed. After save_recording, poll job.saveState=saved; job.state remains ready so the bytes can still be retrieved. Inspect dimensions, duration, frame count and codec with a media probe. Save the editable project when requested. Report passed, failed and untested checks separately.
+Runtime source, editable .slotvfx project and rendered video are different deliverables. Confirm the requested target and destination. Current export_runtime writes project_data.json and diagnostics only; listed runtime scripts and external assets are planned artifacts, not delivered files. Use the editor Game Runtime Export for a full bundle, then inspect its actual contents. `run_quick_test` with `captureFrame: true` renders one frame through the Pixi or Phaser runtime: a quick runtime spot check, not a full engine test. Use export_runtime diagnostics before writing files; use a fresh task-owned directory and overwrite:false. A successful export is not runtime parity: load and exercise the exported target for any parity claim. MP4/WebM recording requires job.lifecycleState=completed. After save_recording, poll job.saveState=saved; job.state remains ready so the bytes can still be retrieved. Inspect dimensions, duration, frame count and codec with a media probe. Save the editable project when requested. Report passed, failed and untested checks separately.
 
 ## Reuse existing expertise
 
@@ -62,7 +63,9 @@ For a new or rejected visual direction, apply the [visual-direction checkpoint](
 
 Keep snapshots of affected tracks, nested objects and memberships before substantial edits. `includedLayerIds` replaces a full list; preserve unrelated entries. Exact-time key writes do not erase keys at other times: read the old track, remove only the intended old times, then upload ordered batches below current limits. Compare values and times as well as counts. A cloud checkpoint is not a local backup; use the existing local project/undo route or an authorized saved copy.
 
-Read animatable-property support before adding tracks. Accepted config keys may be stored without driving animation. Image FX keys can live in the effect stack rather than the main timeline. Preserve omitted nested fields and shared shader bindings. For a scoped edit to a locked layer, remember and restore its lock state. `hiddenBy: ["timeline"]` is not evidence a layer is unused elsewhere. An invisible/off-screen layer may still simulate.
+Read animatable-property support before adding tracks. On 0.9.79 the timeline plays these: images `visible`, `x`, `y`, `rotation`, `scaleX`, `scaleY`, `opacity`, `sourceSpriteSheetFrame`, `sourceVideoTime` and Deform warp-grid points; particles `visible`, `opacity`, `emissionRate`, `x`, `y` and `motionRelease` (a step key that releases live particles from the emitter's motion); Spine `visible`, `x`, `y`, `scale`, `rotation`, `opacity`, `animation`, `loop`, `skin` and track keys; groups `visible`, `opacity`, `positionX` and `positionY`; force fields `visible`, `x`, `y`, `strength`, `radius` and `pathProgress`. Other config keys can be accepted and stored without driving animation, even where a feature schema marks them keyable: key one and check a frame before building on it. Image FX keys can live in the effect stack rather than the main timeline.
+
+Settings groups (Path Stroke, Group Emitter, Spawn Sync, Path Motion, mesh Physics Assist and similar) are stored as one object. Newer builds also list each field of a group as its own feature, for example `image.pathStroke.count`: when `find_features` returns such a field, write only that field with `set_property`. Otherwise read the whole object, change the field, write the object back and read back a field you did not change. Preserve omitted nested fields and shared shader bindings. For a scoped edit to a locked layer, remember and restore its lock state. `hiddenBy: ["timeline"]` is not evidence a layer is unused elsewhere. An invisible/off-screen layer may still simulate.
 
 For timing-critical particles, inspect and set lifespan/angle variance deliberately. Choose simulation space from intended motion: world-space particles can remain where born; particles intended to ride a moving prop need the supported local/follow arrangement. Do not carry old parameter defaults, hardcoded IDs or private config paths into another project. Prewarm is a measured option, not a universal fix.
 
@@ -81,6 +84,8 @@ For timing-critical particles, inspect and set lifespan/angle variance deliberat
 ## Recording checks
 
 Use the requested/established frame rate and dimensions; the media-delivery smoke fixture uses 30 fps. Set per-job framing and the exact named timeline/scenario, preserving aspect ratio and audio. For clips, repeated cycles and seamless-loop settings must be supported; scenarios are a separate once-through contract. Inspect actual seam motion, state transitions and first frames, not just frame counts. A still second lap may be a failed loop, while an authored hold can be intentional.
+
+The desktop export queue holds six jobs in total, including finished jobs and exports started in the editor; a full queue fails with `EXPORT_QUEUE_FULL`. Recording needs a paid export license.
 
 `save_recording` starts a native Save As workflow. For supported autonomous binary retrieval, follow the exact job, offsets and nextOffset, decode programmatically, verify byte count/hash when provided, and promote a new partial file only when complete. Do not select the newest wildcard file, append blindly on retry, or delete unrelated jobs to free capacity. A cancelled Save As leaves completed bytes available; it is not a delivered file. Preserve audio and quality when combining requested clips; do not duplicate 30 fps frames and label them a fresh 60 fps render.
 

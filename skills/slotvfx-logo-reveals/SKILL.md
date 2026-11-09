@@ -21,7 +21,7 @@ Read [MCP workflow](references/mcp-workflow.md) when connecting, authoring masks
 
 ## Choose the visual idea
 
-Start with a clear action: assemble, ricochet, brake, strike, correct, launch, or recover from a glitch. Distinguish variants through choreography and rhythm as well as color. Use [reveal recipes](references/reveal-recipes.md) for the motion concepts and splitting/pivot technique tested in this session.
+Start with a clear action: assemble, ricochet, brake, strike, correct, launch, or recover from a glitch. Distinguish variants through choreography and rhythm as well as color. Use [reveal recipes](references/reveal-recipes.md) for the motion concepts and splitting/pivot technique tested in this session. SlotVFX also ships editable reference projects as resources: `slotfx://examples/logo-clean-hit`, `logo-parts-assemble`, `logo-shine-finish`, `composition-logo-light`, `composition-mask-reveal` and `composition-two-clip-transition`, each with `base/project` and `variation/project` plus `preview-dark` and `preview-light` frames. Reading one does not open or change the current project; adapt the roles and resolve fresh IDs.
 
 Design checks:
 
@@ -35,7 +35,7 @@ These are design checks, not inherited personal preferences. Do not add generate
 
 ## Build and revise
 
-Establish the logo's entrance, strongest beat, settling motion, and readable finish. Tune those before adding a dense effects stack. Use [motion craft](../slot-vfx-motion-craft/SKILL.md) to key those eases, springs and beats exactly. Keep particles tied to contacts, acceleration, discharge, or another visible cause. Parameterize dimensions, colors, pivots, timing, and intensity for the current logo.
+Establish the logo's entrance, strongest beat, settling motion, and readable finish. Tune those before adding a dense effects stack. Use [motion craft](../slot-vfx-motion-craft/SKILL.md) to key those eases, springs and beats exactly. For a standard move on one part (pop-in, tada, wiggle, heartbeat glow, slide in), `slotfx_apply_motion_preset` (from 0.9.78) writes the editor's own keys. Keep particles tied to contacts, acceleration, discharge, or another visible cause. Parameterize dimensions, colors, pivots, timing, and intensity for the current logo.
 
 Keep components independently editable and name layers by their role, for example “Mechanical Snap · Emblem Left Piece” or “Speedrun · Brake Sparks.” For a localized revision, change the named component and visually verify the untouched components instead of redesigning the whole effect.
 

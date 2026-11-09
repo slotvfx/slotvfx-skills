@@ -42,6 +42,8 @@ Prewarm is optional and measured; it costs startup time on every play. Use it on
 
 ## Verify both staying and stopping
 
+Start with `slotfx_check_particle_effect` on the hold's clip with `loop: true` and `role: "hold"`. It checks `creep` (a hold that builds up from 5 s to 30 s), `seam` (population, alpha, position or key-speed jumps at a wrap), `first` (empty first frames) and `tail` (particles alive after the stop; `stopTime` sets when births stop, by default after a 30 s hold). Fix FAIL and WARN rows, then do the checks below by eye.
+
 Preview before and after the clip boundary, at two and four clip lengths, and at the expected longest hold. Use `includeImage: false` renders for counts and frames or natural playback for appearance. Inspect:
 
 - Entry particles end once and do not unexpectedly repeat.

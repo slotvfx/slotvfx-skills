@@ -11,6 +11,8 @@ The build skills say what to make. This one says how it moves, and how to write 
 
 Lines marked **(tested)** were measured in SlotVFX 0.9.59 through the MCP. Everything else is a starting point taken from motion-design practice (HyperFrames, GSAP, Remotion and the 12 principles); keep it only if it looks right on the real art at player scale. Where an approved number already exists in another SlotVFX skill, that number wins.
 
+**Standard moves first (from 0.9.78).** For a float, shake, bounce, pulse, wiggle, pendulum, sway, coin spin or another of the editor's Add motion presets on image layers, `slotfx_apply_motion_preset` writes the same eased keys the editor does, with whole cycles for loops, seeded randomness and a stagger across layers; `slotfx_list_motion_presets` lists each preset's settings. Dry-run it, then read the keys back. Use this skill's script for what the presets don't cover: custom eases, springs, log-space scale, beats and Spine keys.
+
 ## 1. How SlotVFX evaluates a key
 
 **A key pair with `free` tangents is a CSS / After Effects cubic-bezier (tested).** Sampled positions matched `cubic-bezier(0.25, 1, 0.5, 1)` and `back.out` to 0.01 px. So for a segment from key A (time t0, value v0) to key B (t1, v1) and a named ease `(x1, y1, x2, y2)`:
@@ -23,7 +25,7 @@ B.tangents = { mode: "free", in:  { dt: (x2−1)·(t1−t0), dv: (y2−1)·(v1�
 - A named ease is therefore two keys, not a sampled run. `scripts/motion_keys.py ease` writes them.
 - Overshoot eases work: a handle can carry the value past the next key. `back.out` went about 10% past the target and settled (tested).
 - Use `timeMode: "exact"`. The default `legacy` snaps to tenths of a second and moves every handle-carrying key.
-- Image layers key `x`, `y`, `scaleX`, `scaleY`, `rotation`, `opacity`. Particles key only `x`, `y`, `opacity`, so a particle's own scale or ease lives in its size and alpha curves (`set_project_curve`).
+- Image layers key `x`, `y`, `scaleX`, `scaleY`, `rotation`, `opacity` (plus sprite-sheet frame and Deform warp-grid points). On 0.9.79 particles key `x`, `y`, `opacity`, `emissionRate` and `visible`, so a particle's own scale or ease lives in its size and alpha curves (`set_project_curve`).
 - Keep overshoot off `opacity`: it cannot go past 1. Put opacity on its own keys with a plain `.out` ease at the same times as the transform.
 - The authoring guide says export bakes graph segments into runtime easing curves. Exact runtime parity of free handles was not measured here. Before promising frame-exact timing to a game dev, check one clip in the headless harness from [slotvfx-build-verification](../slotvfx-build-verification/SKILL.md).
 - Measure, don't eyeball: `get_timeline` with `motion: { targetIds, timesSeconds }` returns evaluated positions and speeds. A speed jump between two neighbouring samples means a handle that doesn't match its neighbour. For scale, `render_layout` with `includeImage: false` returns `contentBounds` per strip cell; its precision is one world pixel per output pixel, so render at a 1:1 or 1:2 ratio.
@@ -117,7 +119,7 @@ The script also takes `--origin edges`, `start`, `end`, `random`, `reels` (colum
 
 **Where the delays live:**
 - **Per-cell templates** ([slot-vfx-per-cell-effects](../slot-vfx-per-cell-effects/SKILL.md)) are spawned by the game. The template has no stagger; hand the dev the delay table with the integration notes.
-- **Scene clips:** offset each cell layer's keys by its delay. `stagger_layers` shifts layers by one fixed interval in the order you give (the first stays put), so it can't express cells that share a distance. Use it for reel order, and per-layer key offsets for centre or edge spreads.
+- **Scene clips:** offset each cell layer's keys by its delay. `stagger_layers` shifts layers by one fixed interval in the order you give (the first stays put), so it can't express cells that share a distance. Use it for reel order, and per-layer key offsets for centre or edge spreads. `apply_motion_preset` takes its own `stagger` when the move is a preset.
 
 ## 6. Beats, rhythm and win escalation
 

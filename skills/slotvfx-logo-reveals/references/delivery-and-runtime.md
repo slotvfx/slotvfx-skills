@@ -25,7 +25,7 @@ The 0.9.50 schema supports `matchTimeline: true` with `settings: { seamlessLoop:
 
 Record sequentially unless the current recorder explicitly supports independent concurrent captures. Keep a resumable manifest of clip IDs, duration, job ID, output path, and completion status. Download completed recordings in bounded chunks, check the total byte count, then validate the saved file.
 
-The 0.9.50 schema limits the queue to six jobs, including completed jobs. Only discard this task's downloaded jobs after confirming their files are complete. Clearing other jobs or deleting old local videos requires that scope from the user. Avoid broad filename-based deletion, especially outside the task's output directory.
+The desktop export queue holds six jobs, counting finished jobs and exports started in the editor (0.9.79); a full queue fails with `EXPORT_QUEUE_FULL`. Only discard this task's downloaded jobs after confirming their files are complete. Clearing other jobs or deleting old local videos requires that scope from the user. Avoid broad filename-based deletion, especially outside the task's output directory.
 
 For silent previews, set audio off. When audio is part of the request, preserve it and use an audio-aware assembly process; the helper below deliberately refuses audio inputs.
 

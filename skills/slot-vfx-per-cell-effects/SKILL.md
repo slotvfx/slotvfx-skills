@@ -21,7 +21,7 @@ One copy is a useful visual check, but it does not establish behavior at the gam
 
 Look for effects reading scene time instead of instance time, followers using the template's position, and baked animation restarting when unrelated ambience loops. A copy mounted at an offset and started a few frames late catches all three. Check birth, steady state, stop/tail and reuse of pooled copies where applicable.
 
-For a performance task, measure realistic counts in the actual runtime: update time, draw calls, upload cost, particle counts and sheet memory as relevant. Do not build a large headless benchmark for every small visual revision; use [performance](../slot-vfx-performance/SKILL.md) when needed.
+For a performance task, measure realistic counts in the actual runtime: update time, draw calls, upload cost, particle counts and sheet memory as relevant. Do not build a large headless benchmark for every small visual revision; use [performance](../slot-vfx-performance/SKILL.md) when needed. For a quick screen in the editor first, `check_particle_effect` reports the peak live count and sprite fill of one copy against a budget, and `check_spine_export` with `settings.instances` counts Pixi 8 draw calls for several copies of a Spine. Multiply by the real copy count; these screen, they do not replace a runtime measurement.
 
 ## Keep the repeated cost deliberate
 

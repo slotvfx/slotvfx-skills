@@ -25,7 +25,7 @@ If the target genuinely needs different horizontal and vertical scales, map each
 - Circular radii become elliptical under anisotropic mapping, unless retaining circles is a deliberate design choice.
 - Keep lifetimes and choreography initially. Rates, caps and variance are starting values to compare, not invariants when clipping, coverage or runtime constraints change. Emitter and sprite areas no longer grow together, so retune rates and caps deliberately.
 
-Set timing-critical defaults explicitly. The supplied pack observed a 0.4 s lifespan variance default in older builds; read the current default and carry the source's actual value. Compare live counts and motion to the source under equivalent times/seeds, allowing natural randomness rather than imposing an arbitrary percentage as proof of correctness.
+`get_entity` lists only the values that differ from a fresh layer, which is a quick list of what the source actually set; `get_entity_values` reads the same fields from many layers at once for the source → target table. Set timing-critical defaults explicitly. The supplied pack observed a 0.4 s lifespan variance default in older builds; read the current default and carry the source's actual value. Compare live counts and motion to the source under equivalent times/seeds, allowing natural randomness rather than imposing an arbitrary percentage as proof of correctness.
 
 ## Carry assets and color carefully
 
@@ -35,6 +35,6 @@ Choose color for contrast and requested identity. A glow tinted the same colour 
 
 ## Verify and hand off
 
-Preview full-board placement (`render_layout` with `background: layout`) and then the effect 1:1 at normal player size; don't judge it zoomed. Check entry, peak, tail, loop/hold behavior, second-cell placement (shift the group to another cell or column with `render_layout`'s render-only `offset` and check it travels intact) and any runtime-specific features. Use temporary `render_layout` overrides where supported before committing exploratory changes, and write only what worked. Confirm in the editor itself; `capture_viewport` gives a still of the editor view.
+Preview full-board placement (`render_layout` with `background: layout`) and then the effect 1:1 at normal player size; don't judge it zoomed. Check entry, peak, tail, loop/hold behavior, second-cell placement (shift the group to another cell or column with `render_layout`'s render-only `offset` and check it travels intact) and any runtime-specific features. Use temporary `render_layout` overrides where supported before committing exploratory changes, and write only what worked. Confirm in the editor itself; `capture_viewport` gives a still of the editor view. To place the ported effect, `move_effect` moves all of its layers by one delta, including path nodes, target points and their handles.
 
 For a substantive port, update existing notes with source/target dimensions and scale factors, a per-layer source → target table, asset substitutions, live counts measured against the source, and intentional deviations with their reasons. Supply the actual trigger/play/stop integration (through the project's own helper, if it has one), any GDD rule that governs when the game may fire the effect, and the runtime version when game delivery is part of the task. Do not claim engine compatibility solely from an editor preview.

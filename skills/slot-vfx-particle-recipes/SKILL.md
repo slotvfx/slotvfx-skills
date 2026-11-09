@@ -19,7 +19,7 @@ These are historical failure cases. Inspect current tool warnings and defaults; 
 | --- | --- | --- |
 | The pack observed `lifeSpanVariance` defaulting to **0.4 s** (seconds, not a fraction). | A 0.25 s spark lives anywhere from 0 to 0.65 s, and a Target Point head arrives late. | Set it on every layer: 0 for anything that has to land on time. |
 | The pack observed a wide default `angleVariance`. | A light column drifts sideways and a fan loses its shape. | Set it explicitly. `create_layers` warns about this; the warning is real. |
-| Older tested builds accepted some `config.*` keys (emission rate, angle) without animating them; only opacity, x / y and image-transform keys drove anything there. | A keyed rate change renders byte-identical to no key. | Check the current animatable-property schema. If rate animation is unsupported, use separate emitters split by `startTime` / `duration` for surge and sustain. Verify other supported tracks rather than assuming all accepted keys animate. |
+| Older tested builds accepted some `config.*` keys (emission rate, angle) without animating them. On 0.9.79 the timeline plays particle `visible`, `opacity`, `emissionRate`, `x`, `y` and `motionRelease`; angle, size, colour and spin keys are still not played, even where the feature schema calls them keyable. | A keyed change renders byte-identical to no key. | On 0.9.79 key `emissionRate` directly and check a frame. For other settings, or on older builds, use separate emitters split by `startTime` / `duration` for surge and sustain. |
 | A keyed emitter in world space (`simulationSpace` 1). | A long-lived glow stays where it was born while the prop it should follow moves away. | Anything that must stay on a moving prop goes in **local space (0)**, keyed with the same x / y times as the prop. |
 | `startTime` belongs to the layer, not the clip. | A layer shared by two clips fires at the same time in both. | For visual gating, opacity keys can hide it until the beat; simulation may still run. Use clip membership or separate timed layers when actual births must be delayed. |
 | An immortal burst at 0 s in a looping clip. | Missing on frame 0 and at every seam. | Try a small supported prewarm only if this fault reproduces (`prewarmDuration` 0.2 s fixed it on an earlier build); compare an immediate-birth setup and measure startup cost. |
@@ -61,7 +61,7 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 ### Portal or vortex
 
 - **Spiral motion:** radius (orbit) emitter mode. `orbit.outerRadius` → `orbit.innerRadius` with `orbit.spinRate` spirals specks in; the reverse spirals them out. No force fields needed.
-- **Aperture, swirl, counter-swirl and rim:** single particles with `startSize` 0 and `endSize` at full size, **all on one shared project curve** (`custom:…`). One curve keeps the hole, swirl and rim opening and closing together.
+- **Aperture, swirl, counter-swirl and rim:** single particles with `startSize` 0 and `endSize` at full size, **all on one shared project curve** (`custom:…`, made with `slotfx_set_project_curve`). One curve keeps the hole, swirl and rim opening and closing together.
 - **Depth without a mask:** a flat disc with normal blend under the additive layers keeps the centre darker than the rim.
 
 ### Flames
@@ -84,7 +84,7 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 ### Coin fountain
 
 - **Coins:** an 8-frame flip flipbook with **normal blend**, 820 ± 140 px/s, gravity about 900, angled 10° outward.
-- **Rate change:** a surge emitter and a sustain emitter per side, with different `duration`s, so the rate halves on cue. Stop births well before the clip end.
+- **Rate change:** a surge emitter and a sustain emitter per side, with different `duration`s, so the rate halves on cue. On 0.9.79 an `emissionRate` key can do it on one emitter; check a frame. Stop births well before the clip end.
 
 ### Props animated with images, and glows that stay on them
 
@@ -120,6 +120,7 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 
 ## Verify
 
+- **Check first:** `slotfx_check_particle_effect` on the layer, group or clip (pass `role` burst, fountain, hold or ambient when the names don't say) flags pops over budget, tails after the stop, holds that creep, loop seams, empty first frames, clipping, a symbol covered too long, uniform spreads, additive solids, flashing and several traps above (a trail child with rate 0, a death burst on an immortal parent). Fix every FAIL and WARN, run it again, then look.
 - **Did it fire, and where:** `render_layout` with `includeImage: false`, reading `liveParticlesByEmitter` and `contentBounds` at the beats.
 - **How it looks:** review entry, strongest beat and tail through natural playback in SlotVFX over the real background. Use captured frames only for a specific diagnostic or requested comparison.
 - **One-shots:** verify zero live particles at the intended completion, including any deliberate tail. A held or overlapping effect has a different stop contract.

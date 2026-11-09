@@ -4,7 +4,7 @@ Original authoring tests used SlotVFX **0.9.49** on 2026-09-26. The installed **
 
 ## Connection and inventory
 
-Use the available SlotVFX MCP tools. If absent from tool discovery but the desktop app is installed, inspect its supported MCP integration and adapter shipped with that installed version. In this session, the bundled adapter exposed `createAutoDiscoveringSlotfxBridgeClient` and `callSlotfxTool`; an older source checkout exposed a stale interface. Use the local MCP adapter provided with a compatible SlotVFX Desktop build and the tools connected through your client. Do not copy another installation’s server, hardcode a former workspace path or print bridge credentials.
+Use the available SlotVFX MCP tools. If none are available, follow [Connect SlotVFX](../../slotvfx-mcp-authoring/references/connect-slotvfx.md) rather than improvising a connection. For a scripted batch outside the chat, the MCP adapter shipped with the installed app can also be called directly. In this session, the bundled adapter exposed `createAutoDiscoveringSlotfxBridgeClient` and `callSlotfxTool`; an older source checkout exposed a stale interface. Use the local MCP adapter provided with a compatible SlotVFX Desktop build and the tools connected through your client. Do not copy another installation’s server, hardcode a former workspace path or print bridge credentials.
 
 After resolving the current adapter module, its tested call pattern was:
 
@@ -21,7 +21,7 @@ Keep base64 payloads out of logs. For batches, save compact progress and artifac
 Useful reads:
 
 - `slotfx_get_editor_state`: project ID, dimensions, playback, selection, counts.
-- `slotfx_list_entities`: include hidden entities for preservation checks. Paginate or use an adequate supported limit; the tested default could omit layers beyond 200.
+- `slotfx_list_entities`: include hidden entities for preservation checks. Paginate or use an adequate supported limit (up to 500 on 0.9.79); the tested default could omit layers beyond 200. `slotfx_get_hierarchy` returns the whole Layers tree, front first.
 - `slotfx_get_entity`: `detail: "full"` returns all feature values/config; `fields` can retrieve named features.
 - `slotfx_get_timeline`: returns the active/requested timeline plus timeline metadata. There was no `slotfx_list_timelines`. Fetch each relevant clip's full tracks when needed.
 - `slotfx_get_assets` and `slotfx_export_asset`: inspect the actual logo or source sprite.
@@ -36,7 +36,7 @@ Snapshot relevant original feature values, timeline memberships/tracks, and shar
 - Give each new concept a unique group/timeline and explicitly include `group:<id>` rather than inheriting the scene.
 - `slotfx_create_timeline` has `makeActive`; the default need not switch the editor. Pass the intended timeline ID to later animation calls.
 - For layer duplication, set `clipIds` to destination clips. On 0.9.59 (source-checked): with `clipIds` omitted, the copy joins the clips its *original* plays in, not the open clip; `clipIds: []` removes direct membership, but a clip that includes the copy's parent group (`group:<id>`) still includes it. Read the reply's `duplicate.clipIds`, which lists every clip that effectively includes the copy. On 0.9.49, `clipIds: []` was rejected when the destination group was included whole in a clip; preserve existing membership while resolving the intended destination.
-- `slotfx_create_entity` has no `clipIds` parameter. On 0.9.59, images created while a clip was active were added to that clip's `includedLayerIds`. Read the clip back after creating and correct it with `slotfx_update_timeline`, passing the full list.
+- `slotfx_create_entity` has no `clipIds` parameter. On 0.9.59, images created while a clip was active were added to that clip's `includedLayerIds`. Read the clip back after creating and correct it with `slotfx_update_timeline`, passing the full list. To create images straight into the intended clips, use `slotfx_create_layers` with `clipIds` instead.
 - Group duplication copies the group's owned clips and rejects `clipIds` (0.9.59). Inspect returned IDs/memberships and shader bindings; do not assume a shallow copy or independent graph.
 - Entity type is `effect`; shader-effect features use `vfxEffect.*`. Timeline targets use `vfx:<id>` for VFX effects. Check current schemas if uncertain.
 - Tested write limits: 25 initial particle feature values, 100 property changes, and 200 timeline keys per batch.

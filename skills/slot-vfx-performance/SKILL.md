@@ -25,6 +25,10 @@ Collect only metrics relevant to the concern:
 
 Software rendering and headless environments may distort GPU timings; on an earlier build the same scene's render time measured both 19 ms and 2.5 ms on a software GPU. Use them to compare controlled CPU/structural metrics, label the environment, and avoid promising device FPS from those numbers.
 
+## Screen in the editor first
+
+The editor's own checks find the usual suspects before any harness: `analyze_performance` (static particle, trail, draw-call, texture-memory and screen FX diagnostics), `check_particle_effect` (peak live count and sprite fill against a budget, holds that creep), `check_spine_export` (peak draw calls a frame on Pixi 8, counted with Pixi 8's batching rules, plus blend switches, atlas pages, vertices, meshes and textures stored twice, for up to 100 instances) and `compare_variants` for two versions side by side. Textures stored twice can be merged with `remove_spine_atlas_duplicates` (0.9.79, a dry run by default). These are editor screening numbers, not device frame times: confirm a finding in the target runtime at the real copy count.
+
 ## Test the expensive component
 
 The supplied pack documented these historical cases; the numerical savings are examples, not expected results:

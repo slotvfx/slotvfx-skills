@@ -13,4 +13,4 @@ Read [workflow routes, motion and recording checks](references/workflows.md); us
 
 Use natural playback in the existing editor for motion review. Chat frame strips and recorded files are separate requested outputs or targeted diagnostics. Keep authored loop/duration and existing recorder settings intact when merely showing the sequence. Never expand an inspection-only tool policy.
 
-If no `slotfx_` tools are available at all, SlotVFX never connected to Claude Code; say so plainly instead of attempting the work. On macOS the plugin needs Node.js: tell the user to install the LTS version from https://nodejs.org, restart Claude Code, and open SlotVFX with Connect AI turned on. If Node.js is already installed, ask them to run `/mcp` and share the SlotVFX error. On Windows, ask them to check that SlotVFX Desktop 0.9.64 or newer is installed, then restart Claude Code.
+If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
