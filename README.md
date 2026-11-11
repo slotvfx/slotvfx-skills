@@ -21,7 +21,7 @@ For Codex, install **all 20** `skills/<name>` folders into your Codex skills dir
 | [create-vfx](skills/create-vfx/SKILL.md) | Create, inspect or revise editable particles, artwork, logo reveals and game effects directly in SlotVFX Desktop. Show the result in the editor using its existing clip, focus and playback tools. |
 | [deliver-vfx](skills/deliver-vfx/SKILL.md) | Export or record approved SlotVFX effects as runtime assets, editable projects or MP4/WebM, and verify the requested delivery. Use when the user asks for a SlotVFX export or recording. |
 | [gdd-to-vfx](skills/gdd-to-vfx/SKILL.md) | Turn a game brief or GDD into a scoped SlotVFX effect pack and integration handoff with reusable effects, event contracts, anchors and target checks. |
-| [motion-sequence](skills/motion-sequence/SKILL.md) | Author SlotVFX trailers, motion graphics and multi-stage sequences using clips, Scene Animator states, recorder scenarios, shaders, artwork and Spine animation. |
+| [motion-sequence](skills/motion-sequence/SKILL.md) | Author SlotVFX Timeline Director sequences and trailers with clip bars, music, beats, titles, Blends and Speed keys; use Scene Animator and recorder scenarios for event-driven flows. |
 | [slot-vfx-effect-pack](skills/slot-vfx-effect-pack/SKILL.md) | Build a complete slot VFX pack in SlotVFX from a game brief, GDD and art: map the board, author effect groups and clips, verify in context, and prepare a practical game integration handoff. |
 | [slot-vfx-hold-loops](skills/slot-vfx-hold-loops/SKILL.md) | Create or repair SlotVFX effects that sustain for variable durations, such as anticipation, win count-ups and cell highlights. Separate entry from sustain, verify loop seams and explicit stopping in the target runtime. |
 | [slot-vfx-motion-craft](skills/slot-vfx-motion-craft/SKILL.md) | Write how a SlotVFX effect or Spine character moves — eases, springs, scale pops, staggers, beats, win escalation, loops, Spine body mechanics, breathing and overlap — as exact keys, and check Spine keys for broken motion. Use with the build skills whenever something animates. |
@@ -38,6 +38,12 @@ For Codex, install **all 20** `skills/<name>` folders into your Codex skills dir
 | [slotvfx-mcp-authoring](skills/slotvfx-mcp-authoring/SKILL.md) | Author and refine SlotVFX projects through MCP: discover effect parameters, preserve existing work, manage clip membership and keyframes, read back writes, and verify changes. Use alongside the relevant visual-design skill. |
 | [slotvfx-showcase-video](skills/slotvfx-showcase-video/SKILL.md) | Record requested SlotVFX clips or state-machine scenarios through MCP, verify true frame rate and loop behavior, save files reliably, and combine or deliver videos when requested. Supports named timelines and repeated cycles in 0.9.50. |
 | [spine-vfx](skills/spine-vfx/SKILL.md) | Prepare and revise effects on existing Spine actors in SlotVFX, including bone or slot particle attachment, loop review, sprite plates and recorded or runtime delivery. |
+
+## Sequence authoring and visual review
+
+The updated authoring guidance covers the 0.9.80 tool contract: Timeline Director clip arrangements, Speed keys, sequence recording and game-export limits, plus protected Spine pose workflows. See [Timeline Director and Speed keys](skills/motion-sequence/references/timeline-director.md); use the connected build's schemas for its actual capabilities.
+
+For effects that read poorly or an open visual direction, [visual critique and coordinated effects](skills/create-vfx/references/visual-critique.md) connects visible problems to focused adjustments, compares meaningful drafts and aligns effects with actor/symbol cues. It preserves approved styles, animation, sustained holds and the requested scope.
 
 ## Scope and provenance
 

@@ -13,6 +13,10 @@ Lines marked **(tested)** were measured in SlotVFX 0.9.59 through the MCP. Every
 
 **Standard moves first (from 0.9.78).** For a float, shake, bounce, pulse, wiggle, pendulum, sway, coin spin or another of the editor's Add motion presets on image layers, `slotfx_apply_motion_preset` writes the same eased keys the editor does, with whole cycles for loops, seeded randomness and a stagger across layers; `slotfx_list_motion_presets` lists each preset's settings. Dry-run it, then read the keys back. Use this skill's script for what the presets don't cover: custom eases, springs, log-space scale, beats and Spine keys.
 
+## Clip speed and sequence timing
+
+For whole-clip speed changes use `slotfx_set_clip_slow_motion` and read `slotfx://authoring-guide/slow-motion`. Speed keys drive all layers on one clock; retain ordinary property keys for the motion's shape. Inspect `clipDuration` versus `playedDuration`, clip frame rate and `slowDownSound`. Pitch follows rate when sound follows the clip; normal-rate sound is an explicit option. Sequence bar speed is a separate constant multiplier. Read [Timeline Director and Speed keys](../motion-sequence/references/timeline-director.md) for arrangements and recording; re-read bar endpoints after changing source Speed keys.
+
 ## 1. How SlotVFX evaluates a key
 
 **A key pair with `free` tangents is a CSS / After Effects cubic-bezier (tested).** Sampled positions matched `cubic-bezier(0.25, 1, 0.5, 1)` and `back.out` to 0.01 px. So for a segment from key A (time t0, value v0) to key B (t1, v1) and a named ease `(x1, y1, x2, y2)`:
@@ -140,6 +144,10 @@ For keyed layers, give each layer a different whole number of cycles per clip, s
 
 - **Velocity-matched cut:** exit with an `.in` ease and enter with the `.out` of the same family. Both pass through the cut at the same speed when distance divided by duration is equal on each side. For `power2` the speed at the cut is about 3× the average speed.
 - **A transition** that overlaps two scenes shortens the total by the overlap. **An overlay** (light leak, flash) sits centred on the cut and adds no time.
+
+## Coordinate the impact
+
+For a character/symbol interaction, identify its preparation, release/contact and recovery cues. Align FX origin, main accent, requested reaction and sound to that performance; read [visual critique and coordinated effects](../create-vfx/references/visual-critique.md) when they feel disconnected. Keep source versus played time explicit when Speed keys, trims or sequence bar speed are involved. Game-side hit-stop needs a declared host/clock owner when requested; do not infer a global-pause tool or alter approved actor motion for an FX-only revision. Recording-only marker ties and Blends retain their Editor only limits.
 
 ## 9. Judge it as motion
 

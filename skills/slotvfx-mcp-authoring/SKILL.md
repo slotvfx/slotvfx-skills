@@ -9,9 +9,19 @@ Use the bundled [current workflow guide](references/workflows.md) for SlotVFX de
 
 Inspect the current project, relevant entities and timelines before editing. Current user instructions define the scope. New alternatives normally get new named groups and clips; revisions change the specified version. Preserve unrelated work. Creating an effect does not authorize deleting existing layers, recordings or shared assets, posting reports, or exporting video.
 
-This skill adapts the supplied 0.9.50 pack. The installed 0.9.50 MCP schema was checked on 2026-09-26; older behavioral observations below came from the pack and require reproduction when material. Tool names, limits and timeline properties were rechecked against the 0.9.79 tool list on 2026-11-09. Prefer current schemas and actual frames over historical assumptions.
+The current routing below covers the 0.9.80 source/tool contract. Older 0.9.50/0.9.59 observations remain historical leads, not proof about the connected app. Prefer current schemas and actual frames over historical assumptions.
+
+General tool names, limits and timeline properties were also checked against the 0.9.79 tool list on 2026-11-09.
 
 To add or edit Spine animations, use `slotfx_get_spine_rig`, `slotfx_get_spine_animation`, `slotfx_propose_spine_animation` and `slotfx_preview_spine_animation` with `slotfx://authoring-guide/spine-animation`; the [Spine skill](../spine-vfx/SKILL.md) covers the flow. If those tools are missing, ask the user to update SlotVFX rather than editing skeleton JSON.
+
+## Sequences, Speed keys and protected Spine poses
+
+Read `slotfx://authoring-guide/sequences` for Timeline Director and `slotfx://authoring-guide/slow-motion` for clip Speed keys. Use [the sequence workflow](../motion-sequence/references/timeline-director.md) for examples and recording/export limits. `slotfx_edit_sequence` reads or edits bars, trims, repeats, markers and End as one undoable operation. Use `slotfx_set_clip_slow_motion` for whole-clip ramps; particle velocity does not slow the clip. Inspect played durations, resolved bars, overlaps and game-export blockers after writes.
+
+Title cards, music/beat grids, marker ties and Blends require an Editor only sequence and are for preview/recording. Game sequences support source clips in Pixi, Phaser, Cocos and WebGL2. Record the sequence ID as `timelineId`; use Scene Animator/scenarios for event-driven flows.
+
+For protected Spine poses, read `localPoseGapWorkflow` and `localBonePosing` in `slotfx://authoring-guide/spine-animation`. The enrolled local-only Spine 4.2 profile is narrower than general animation tools. Read fresh project/revision/source/plan tokens, retain exact native times, and respect approved poses, candidate digests and preview/apply boundaries. Read [Spine guidance](../spine-vfx/SKILL.md) before direct bone or protected-gap edits.
 
 ## Discover features and read back writes
 

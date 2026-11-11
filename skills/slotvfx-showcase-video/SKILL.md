@@ -9,7 +9,13 @@ Use the bundled [current workflow guide](references/workflows.md) for SlotVFX de
 
 Record only when requested. If the user wants to inspect effects directly in SlotVFX, leave the editable result ready there. Save only when requested. Preserve existing recordings and videos unless their deletion or replacement was requested. Use the current workspace for scratch files and its designated outputs folder for deliverables.
 
-The installed 0.9.50 recorder schema was checked on 2026-09-26; limits marked 0.9.59 come from that build's recorder and scenario schemas. Read the current schema and `slotfx://authoring-guide/recording` when available, especially when a setting is refused. Version-specific observations from the supplied pack still need frame verification.
+The sequence/Speed-key routing below covers the 0.9.80 source/tool contract. Older 0.9.50/0.9.59 limits and observations are historical leads. Read the connected schema and `slotfx://authoring-guide/recording`, especially when a setting is refused; verify the actual frames and audio.
+
+## Record Timeline Director sequences
+
+Use [Timeline Director and Speed-key workflows](../motion-sequence/references/timeline-director.md) and `slotfx://authoring-guide/sequences` for arrangements, music, beat grids, titles and Blends. Record the returned `sequenceId` as `timelineId`; `matchTimeline:true` resolves the full played duration, including source Speed keys. Inspect returned timing instead of multiplying source seconds by output FPS. A source clip's `slowDownSound` controls its sound rate/pitch; sequence music uses the sequence clock.
+
+For repeated sequence takes, bars and music repeat per cycle and clip at its End. Nonloop takes hold visuals at End while existing requested-window audio tails may continue. Check audio and visuals on both sides of each seam. Title cards, marker ties, music and Blends require Editor only sequences; recordings do not establish live game support.
 
 ## Choose framing, frame rate and source
 
@@ -31,7 +37,7 @@ In 0.9.50, `matchTimeline: true` with `settings: { seamlessLoop: true, loopWitho
 
 Scenarios run once and use `matchScenario`, not repeated clip cycles. A scenario defines an initial state, timed trigger steps and an end hold. On 0.9.59, `set_recorder_scenario` takes `initialStateId`, `steps` (each with `atSeconds` ≤ 600 or `afterStateComplete: true`, plus optional `params`; e.g. `[{ "atSeconds": 0, "trigger": "spin" }]`) and `endHoldSeconds` (default 1, max 600). Inspect the resolved duration and frame count through `get_recorder`, then record the intended `stateScenarioId` with `matchScenario: true`. Scenario definitions are project data, while selecting one is session-only; save the project if they are meant to persist.
 
-The base timeline plays beneath state clips by design. Supply a neutral base `timelineId` (static scene only) rather than letting a selected effect contaminate a scenario; before 0.9.50, make it active before recording. For several spins, either use a supported complete scenario or separate scenarios whose starting/ending states match, e.g. *Idle → Spin → Win 1*, then *Win 1 → Spin 2 → Win 2*, so the grids match at every join. Crossfades (0.1 s worked) are a presentation choice, not a substitute for correct continuity.
+In 0.9.80, saved scenarios play their state clips independently of the editing clip; no neutral or blank base timeline is required. Pass the intended `stateScenarioId` with `matchScenario:true` and omit an unrelated timeline source. Check actual behavior on older builds. For several spins, use a complete scenario or separate scenarios whose ending/starting states match, e.g. *Idle → Spin → Win 1*, then *Win 1 → Spin 2 → Win 2*. Crossfades are a presentation choice, not a substitute for correct continuity.
 
 Historical issues in the supplied pack:
 

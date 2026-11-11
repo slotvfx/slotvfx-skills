@@ -25,6 +25,8 @@ For a new pack or a rejected visual direction, finish and inspect one representa
 
 Reusable shapes can support different mechanics when their silhouettes, motion, timing and placement differ meaningfully. Recoloring the same burst is insufficient when the mechanics need distinct feedback. Preserve intentional continuity between connected events, such as a projectile and its arrival or a transition and the ambience it reveals. Use approved references when available; a named preset alone does not establish a visual direction.
 
+For an open direction, compare a few distinct silhouette/timing studies before repeating a treatment across the pack. For an approved direction, concentrate on the requested correction. Use [visual critique](../create-vfx/references/visual-critique.md) to diagnose weak reads and synchronize connected FX, symbol/Spine reactions and requested sound. Preserve existing event and sustained-hold contracts while refining the look.
+
 ## Assets and editable structure
 
 Reuse suitable project assets first. Generate a new texture only when it improves the requested look, using the available image workflow and its instructions. Simple readable cores often work better than detailed sprites at player scale.

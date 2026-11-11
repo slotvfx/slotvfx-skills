@@ -42,3 +42,15 @@ Craft: start and end on the idle pose. Build an action as anticipation, strike, 
 To retarget an animation between rigs, `slotfx_propose_spine_mapping` proposes a bone mapping; the animator reviews and applies it in Retarget Animation.
 
 SlotVFX does not include a Spine license. To export Spine animations or use the Spine Runtimes in their products, users need their own Spine license from Esoteric Software.
+
+## Coordinate effects with the performance
+
+Identify release/contact and recovery in the existing animation, verify the attachment's position at those moments, and review the actor and FX together. Coordinate requested target/symbol reactions and sound from the same cue. Use supported layer order or `spine.interleaves` for near/far depth after reading its current schema. Read [visual critique](../create-vfx/references/visual-critique.md) for weak impact, flat depth or a timing mismatch. Preserve an approved performance during an FX-only revision; additional actor edits and host hit-stop must remain within the request and current tool capabilities.
+
+## Protected poses, gaps and direct bone posing
+
+For the 0.9.80 pose-plan workflow, read `localPoseGapWorkflow` and `localBonePosing` in `slotfx://authoring-guide/spine-animation`. Use the live schemas for `slotfx_get_spine_pose_plan`, `slotfx_edit_spine_pose_plan`, `slotfx_edit_spine_pose_gap` and `slotfx_set_spine_pose_preview`. This enrolled local-only Spine 4.2 profile requires fixed skin, isolated track 0 and no physics; it does not extend general animation proposals to every rig/version or cloud project.
+
+Read the current layer/animation/skin, exact canonical times, approvals and project/revision/source/plan context tokens before edits. Gap candidates belong strictly between approved pose-and-timing-locked endpoints. Use deliberate `prepareBoundary` only when requested, then read fresh tokens. `propose` or `stageReturn` stages a candidate; preview it without applying source edits. Applying requires the artist's explicit Apply request, the exact candidate digest and fresh context tokens. Preserve protected endpoints and outside-gap data; respect refusal diagnostics instead of routing around them.
+
+For direct Original corrections, use pose-plan `setBoneKeys` with exact `timeSeconds` and unique `boneEdits`. Translate/rotation values are native setup-relative animation offsets, not scene/world coordinates. The owner/profile, constrained-bone and approved-pose guards still apply; dry-run first and read back accepted values. Keep these changes separate from staged alternatives and general `slotfx_propose_spine_animation` proposals. Do not round close subframes to display frames.
