@@ -1,6 +1,6 @@
 # SlotVFX desktop workflow routes
 
-The SlotVFX local MCP server exposes the editor's own tools without changing their schemas or results: 148 on 0.9.79, fewer on older builds, so check the tool list rather than this guide. The user's installed permissions determine which can be called. Discover current schemas rather than guessing parameters. The editable effect and its playback in SlotVFX are the primary result. These skills contain guidance only; a separately configured MCP client connects to the running app's token-protected local bridge.
+The SlotVFX local MCP server exposes the editor's own tools without changing their schemas or results: 154 on 0.9.82, fewer on older builds, so check the tool list rather than this guide. The user's installed permissions determine which can be called. Discover current schemas rather than guessing parameters. The editable effect and its playback in SlotVFX are the primary result. These skills contain guidance only; a separately configured MCP client connects to the running app's token-protected local bridge.
 
 | Goal | Route | Completion evidence |
 | --- | --- | --- |
