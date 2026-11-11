@@ -108,7 +108,7 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 
 ### Live-particle fire (no flipbook)
 
-Tested on 0.9.80 as a 3 s looping campfire, checker clean. Values from pixelfx (MIT) are in art pixels; at 4× scale multiply accelerations and speeds by 4.
+Tested on 0.9.80 as a 3 s looping campfire, checker clean. Starting values are in art pixels; at 4× scale multiply accelerations and speeds by 4.
 
 - **Tongues:** four layers of a plain square, hot to cool from front to back: white heart, yellow, orange, red rim. Each is wider, longer-lived and one palette step cooler at death than the one in front of it. Lift about 380 px/s², damping 5; a start speed of about 380–400 px/s gives a flame of about 170 px at that damping. Turbulence X 60–90 with a time scale of about 1.6 makes them lean and lick.
 - **Puffs** shed at the tips (damping 3.2), cooling to the darkest step, with smoke from its own emitter at that height.
@@ -142,6 +142,8 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 - **Rocking:** `startSpin` +30 → `endSpin` −30, driven by a custom curve in phase with the sway, so the leaf tips its leading edge down on each swing.
 
 ### Tested recipes (0.9.80, checker clean)
+
+Target squashes, flashes and HUD bumps below are optional integration examples. Edit actor, symbol or UI animation only within the request; for FX-only work, align to existing cues and describe proposed host reactions.
 
 - **Portal without orbit mode:** a dark normal-blend void disc, a dim additive swirl glow, a rim ring, rim wisps outward with short life, swirl streaks from the rim inward (radial acceleration about −1100, tangential about 1500, origin at the emitter), inflow motes from twice the radius, debris lifted by `targetPosition` to the centre (easeIn), a wide theme light and a ground light pool.
 - **Steady glow in a loop:** a crossfade pair (rate 0.5/s, life 4 s, prewarm 4 s), alpha 0 → peak → 0 for additive or a plateau 0 → 1 at 25% → 1 at 75% → 0 for normal blend, size variance about ±5%.
@@ -177,7 +179,8 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 - **Check first:** `slotfx_check_particle_effect` on the layer, group or clip (pass `role` burst, fountain, hold or ambient when the names don't say) flags pops over budget, tails after the stop, holds that creep, loop seams, empty first frames, clipping, a symbol covered too long, uniform spreads, additive solids, flashing and several traps above (a trail child with rate 0, a death burst on an immortal parent). Fix every FAIL and WARN, run it again, then look.
 - **Did it fire, and where:** `render_layout` with `includeImage: false`, reading `liveParticlesByEmitter` and `contentBounds` at the beats.
 - **Does it draw in the editor:** `slotfx_capture_viewport` during playback. `render_layout` can stack layers differently from the editor; an opaque preview backdrop in the clip hid every particle in the editor while renders looked right.
-- **Checker scope (observed on 0.9.80):** `slotfx_check_particle_effect` with `clip` returned "No particle layers in clip" for every clip; `group` with `loop: true` worked, so check loop seams by eye with `render_layout` times on both sides of the clip end. Group mode reported 0 births for burst layers until the group's clip was the active clip; activate the clip before checking and treat "0 births" as a tool state, not a result.
+- **Check the authored clip:** Pass its id or name as `clip` to `slotfx_check_particle_effect` so its keys and loop period are applied. If narrowing to a member group or layer, also pass the intended `clip` and inspect the returned layer scope. Some 0.9.80 sessions reported "No particle layers in clip"; if it reproduces, check the clip selector and membership before using a fallback. For unexpected zero births, inspect emission timing and keys as well as clip selection; activating the intended clip helped a group check in one session. Verify expected births before accepting the result.
+- **Standalone fallback:** If clip checking still fails, `group` with `loop: true` can screen an intended sustain in isolation. It omits clip keys and the clip wrap period, so a clean result does not verify the authored clip. Inspect that clip through natural playback across entry, keyed changes, stopping and wraps; use `render_layout` frames around specific transitions as additional evidence. Report automated clip checks as unverified while the failure remains.
 - **First frames in `render_layout` (observed on 0.9.80):** the first strip cell in which a texture appears can draw glow and flash textures as solid squares; later cells and `capture_viewport` show them correctly. Put a throwaway time first in the strip, or judge the first frame in the editor. A paused seek can also show an early simulation state while the preview rebuilds; capture during natural playback.
 - **Many copies:** no MCP tool runs N copies on a runtime. As a cheap projection, run the checker with its `budget` divided by N (for 10 copies: particles 40, fill 0.3). Large light quads dominate fill; share room or floor lights per scene instead of per copy.
 - **How it looks:** review entry, strongest beat and tail through natural playback in SlotVFX over the real background. Use captured frames only for a specific diagnostic or requested comparison.

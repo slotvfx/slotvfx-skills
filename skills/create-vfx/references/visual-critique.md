@@ -21,7 +21,7 @@ Watch natural playback at gameplay size over the real art. Identify the dominant
 | Flat depth | Use supported layer order, occlusion or Spine interleaving to distinguish near/far material around the subject. Check silhouettes during movement. |
 | Abrupt disappearance or loop jump | Check the intended end/stop contract, tails and last-to-first motion. Repair the discontinuity without shortening a deliberate hold. |
 | Smoke reads as a sticker | Make it translucent with a lit top; let it swell, thin and drift instead of holding one size and alpha. |
-| Strong effect on a target that does not react | Add the target's reaction (flash, push and spring back, tint) on the contact beat; see motion-craft *Impact punctuation*. |
+| Strong effect on a target that does not react | If target animation is within scope, coordinate a suitable reaction (flash, push and spring back, tint) on the contact beat; see [Impact punctuation](../../slot-vfx-motion-craft/SKILL.md#6-beats-rhythm-and-win-escalation). For an FX-only revision, align to the existing performance and describe any proposed host reaction. |
 | Effect and actor disagree | Align attachment position, release/contact cue and reaction using the actual animation, then inspect them together. |
 
 These are diagnoses, not a style preset. A restrained painted effect, a precise mechanical effect and a luminous spell need different solutions. Preserve intentional hard cuts, long holds and static final poses.
