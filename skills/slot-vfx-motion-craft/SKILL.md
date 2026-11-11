@@ -132,6 +132,10 @@ The script also takes `--origin edges`, `start`, `end`, `random`, `reels` (colum
 3. **Anticipation** runs at about 20–30% of the action it precedes. Size it to the payoff: a bigger wind-up for a bigger hit, and the anticipation's size roughly matches the settle's.
 4. **Win tiers (BIG → MEGA → EPIC)** escalate by adding beats on one shared tempo, not by making one beat louder. Each tier lands on the same pulse with a different axis: scale slam, side snap, rise. The top tier gets the longest wind-up and a hold that runs longer than expected before it lands.
 5. **Impact punctuation** (starting point): hold the moving element still for 2–5 frames at 60 fps at contact, as two equal-value keys, then release. It sells weight.
+   - Scale the freeze with the blow: about 0.03 s for a tap up to 0.2 s for the heaviest hit. Particles keep simulating through a keyed hold, so keep it short and start the impact particles at its end.
+   - After the freeze, shake about 1% of the view height for about 0.2 s, decaying, on the board, scene or effect group, not the whole screen. A bigger blow gets a longer freeze and a bigger shake; anticipation runs opposite the blow.
+   - The thing that is hit reacts: a 1–2 frame white flash (Lighten keys), a push of a few pixels away from the blow that springs back, and an optional tint (ice blue, poison green) that clears. A strong effect on a target that doesn't react reads as a miss.
+   - These are clip keys. Game-side hit-stop still needs a declared clock owner (see *Coordinate the impact*).
 6. **Count-ups:** the number ticks in the game. SlotVFX supplies the banner's growth over the same duration and ease, so give the dev the ease name and its bezier. A multiplier or suffix lands after the count, on its own beat.
 
 ## 7. Loops that don't look like loops

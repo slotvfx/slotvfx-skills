@@ -29,6 +29,15 @@ These are historical failure cases. Inspect current tool warnings and defaults; 
 | A TRAIL child with distance fill (`subEmitterTrailSpacing`). | Works on a path head (0.9.45). On a Target Point head it drew nothing in 0.9.44. | If a trail draws nothing, give the child a rate (70–90/s) in its `subEmitterConfig`. |
 | Ribbon length. | The line stops short of the path's end. | Segments × min distance must exceed the path length (128 × 8 for a ~900 px path). |
 | `ribbonColorRamp` in the runtime. | It reads as a single colour. | Don't design a gradient along a drawn line. |
+| `particle.angle` direction (observed on 0.9.80). | Angle 90 points **up** on screen. Rising layers built with −90 launch downward and only gravity turns them round: a flame stays squat and the checker still reports clean. | Use 90 for anything that rises. Check direction on the first rendered frame before tuning speed. |
+| `alphaCurve` with a `colorRamp`. | The schema says the alpha curve is ignored when the ramp has stops, so a flicker or blink curve does nothing. | Put the flicker in the ramp's alpha stops. For a curve, use start/end colour with start alpha 0 and end alpha at the peak, so the curve value maps to alpha. |
+| Radial / tangential acceleration origin. | Each particle accelerates around its own spawn point, so a vortex or gather does nothing visible. | Set `radialAccelerationOrigin` to the emitter and give an initial speed. |
+| Flipbook frame mode `animated` on a burst. | Frames play by particle age, so every particle shows the same frame together. | Use `randomStatic` for most bursts. |
+| `emissionScaleX/Y` on a circle emitter at ground level. | Particles still spawn below the ground line. | Use a rectangle emitter. |
+| `create_layers` / `create_particle` with many settings. | Creation takes at most 25 feature values per layer. | Set the rest with `batch_set_properties`. |
+| A hidden path collider. | Particles fall through the ground. | Keep the collider visible (it doesn't export) on the ground line. |
+| Spark or streak textures with a lot of empty canvas. | The checker's texture row warns (at about 27% core) and the mark reads thin. | Crop the texture to its core. |
+| A spawn-sync follower with `emitOn: "death"` from a short-lived driver (observed on 0.9.80). | The checker counted its births but `render_layout` drew none. | Verify followers in a render. Fallback: an independent emitter at the height where the drivers die. |
 
 **Signs and directions:**
 - Positive particle spin and positive `orbit.spinRate` both turn **counter-clockwise** on screen, while an ellipse path's nodes run **clockwise**. Negate the spins when things have to turn with a path.
@@ -37,6 +46,28 @@ These are historical failure cases. Inspect current tool warnings and defaults; 
 **Velocity stretch:** the sample sparks used 0.006, with 0.005–0.01 a starting range at that scale. Tune to the current speed, texture core and display size.
 
 **Particle styling:** the pack used textures, ramps and layering because its particle layers had no Image FX stack. Check current support before relying on another mechanism.
+
+## Build from particle kinds and light
+
+Give each material its own layer and behaviour instead of one generic emitter. Prefer 10–40 varied particles with uneven births over hundreds of identical ones, and give each layer its own wobble (turbulence or curl noise) rather than a shared sine.
+
+| Kind | Behaviour (starting point) |
+| --- | --- |
+| Spark | Falls at about half the debris gravity, damping 2–3 /s, velocity-stretched with a bright head, cools down the ramp, bounces once on a path collider (restitution about 0.45). Make every third or so 1.5–2× bigger. |
+| Ember | Rises slowly, wanders (turbulence or curl noise), cools and shrinks, flickers out in its last third. |
+| Smoke | Soft, translucent, normal blend; rises and sways, damping 1.2–1.6, swells about 1.5× while it thins, drifts toward grey. A denser low core and a lit cap while young help it read as volume. |
+| Fire puff | Rises fast (negative gravity), brakes hard (damping 3–5), shrinks to about half and cools down the fire ramp; hand off to smoke with a separate smoke emitter at the height puffs die. |
+| Flake / petal | Drifts down with sway and slow spin. |
+| Debris | Tumbles under heavy gravity, bounces, settles and fades at the end. |
+| Twinkle | Thrown fast on curving paths (tangential acceleration), damping about 4, hangs, then blinks out (stepped alpha over the last 30%, in the ramp). |
+
+- **Many small events beat one big one.** A flash, rings, sparks, a puff and glints, timed differently, with varied size, speed, delay and life.
+- **Colour is not light.** Build the readable shape in normal-blend colour; put brightness in separate additive light layers on top.
+- **Ramps:** 7–8 steps from dark to bright, hue-shifted (shadows cooler and deeper, highlights warmer, only the last step white). Particles cool down the ramp as they age instead of only fading. Starting ramps: fire `1f0b10 4a1118 8c1d1c cc3a1a f2701f ffae35 ffe27a fff8d6`; gold `1e1206 4a2c08 86520c c48412 f0b424 ffe066 fff6c4 ffffff`; ice `0c1430 162c5c 1f4f94 2f7fcc 58b4ec 9bdcff d8f4ff ffffff`; poison `0d1a0c 173a14 265e18 3f8a1e 6cb82a a8e04a e0ff8a`.
+- **Two lights per peak:** a tight white light dying in 0.08–0.14 s and a wider theme light dying in 0.3–0.55 s, alpha falling with remaining life squared, 1.3–2× the burst size; a small glow per spark or glint.
+- **Light pools:** a low, soft light (about 15%, breathing) on the surface under anything that really emits light.
+- **Rings:** a thin bright ring fast (about 0.3 s, expo.out, white for its first third), then a thicker softer ring 0.04 s later and slower (about 0.5 s, power3.out). A ring on the board is a flat ellipse (height about 0.2 of the width), with its far half behind the target and its near half in front.
+- **Residue:** something stays and cools for 1–2 s (scorch, frost, embers, settling dust), and it still ends on a one-shot. Per-cell residue counts toward the particle budget.
 
 ## Recipes
 
@@ -73,6 +104,17 @@ For a luminous warm look, a gold tail often reads more clearly than a dark brown
 - **Behind the tongues:** a soft-glow body row fills the gaps.
 - **Embers:** emit from the **tip line**. Embers born inside a bright flame only read once they are above it.
 
+### Live-particle fire (no flipbook)
+
+Tested on 0.9.80 as a 3 s looping campfire, checker clean. Values from pixelfx (MIT) are in art pixels; at 4× scale multiply accelerations and speeds by 4.
+
+- **Tongues:** four layers of a plain square, hot to cool from front to back: white heart, yellow, orange, red rim. Each is wider, longer-lived and one palette step cooler at death than the one in front of it. Lift about 380 px/s², damping 5; a start speed of about 380–400 px/s gives a flame of about 170 px at that damping. Turbulence X 60–90 with a time scale of about 1.6 makes them lean and lick.
+- **Puffs** shed at the tips (damping 3.2), cooling to the darkest step, with smoke from its own emitter at that height.
+- **Licks:** thin direction-facing rectangles, short-lived.
+- **Embers:** lift about 120, damping 1.6, flicker in the ramp. **Pops:** a short flash plus sparks with gravity about 1708, damping 2.2, on a ground collider; time the last pop so its sparks finish before the loop wraps.
+- **Smoke plume:** lift 64–80, damping 1.2, sideways draught +20–44.
+- **Light:** additive hot heart, room glow and floor pool with a jagged alpha curve for flicker.
+
 ### Ambient loops
 
 - **Light shafts:** an immortal or stable sprite with a verified first frame; the pack used 0.2 s of prewarm. Optional subtle opacity breathing (the pack kept it to 5% or less on the loop period) can use a different offset per shaft.
@@ -96,6 +138,16 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 
 - **Path:** a hidden path with the sway built into the path, using stretch mode and `travelOverLifetime`.
 - **Rocking:** `startSpin` +30 → `endSpin` −30, driven by a custom curve in phase with the sway, so the leaf tips its leading edge down on each swing.
+
+### Tested recipes (0.9.80, checker clean)
+
+- **Portal without orbit mode:** a dark normal-blend void disc, a dim additive swirl glow, a rim ring, rim wisps outward with short life, swirl streaks from the rim inward (radial acceleration about −1100, tangential about 1500, origin at the emitter), inflow motes from twice the radius, debris lifted by `targetPosition` to the centre (easeIn), a wide theme light and a ground light pool.
+- **Steady glow in a loop:** a crossfade pair (rate 0.5/s, life 4 s, prewarm 4 s), alpha 0 → peak → 0 for additive or a plateau 0 → 1 at 25% → 1 at 75% → 0 for normal blend, size variance about ±5%.
+- **Rain:** three depth layers (near 5 px at 2400 px/s α 0.5, mid 4 px at 1800 α 0.3, far 2 px at 1200 α 0.18), additive, `faceDirection`, angle about 278; ground splash droplets (280 ± 130 px/s up, gravity 2600, life 0.22), splash crowns (flat rings to 46×12 in 0.3 s), puddle ripples and a faint ground mist; about 360 live.
+- **Confetti:** two low cannons (62° and 118° ± 20, 1900 ± 850 px/s, damping 2.5, turbulence X about 230, large spin variance, life 3.4 ± 1), white paper tinted by a random-colour palette, normal blend, streamers, a muzzle peak (white light, warm light, spark fan, grey puff) and glints above.
+- **Gather → peak → rise (heal, level up):** charge 0–0.4 s with motes inward, a growing body glow and a rune ring; peak with a white light (about 0.12 s), a theme light (about 0.9 s), a narrowing light pillar, two ground rings 0.08 s apart, sparks and rising streaks. The target squashes 0.91/1.06, stretches 1.12/0.92 and settles (key y too, to keep the feet down). Over a character cap the lights: white ≤ 0.45, theme ≤ 0.4, body glow ≤ 0.3.
+- **Pickup to HUD:** the item pops up, then flies on an arc with a riding sparkle stream (`targetPosition`, `targetSpread`, `targetBend`, `lifeSpanVariance` 0). On arrival: a flash, a ring, a star burst and a HUD bump 1 → 1.4 → 0.9 → 1 over 0.25 s. Keep the HUD point about 150 px inside the frame. Several coins hang after the throw (damping about 7), then fly one by one about 0.075 s apart, speeding into the target; each arrival gets a 0.07 s white flash, a 0.14 s counter bump and 2–3 glints.
+- **Heavy gas:** positive gravity about 140 on a visible ground collider, a wide fast spread (480 ± 200 px/s, angle 90 ± 100), alpha about 0.4, growing 170 → 360 px from rectangle emitters; a glowing puddle residue uses a glow texture in additive.
 
 ### Smaller ones that worked
 
@@ -122,6 +174,9 @@ Prewarm costs startup time on every play. Before reaching for it, try a burst at
 
 - **Check first:** `slotfx_check_particle_effect` on the layer, group or clip (pass `role` burst, fountain, hold or ambient when the names don't say) flags pops over budget, tails after the stop, holds that creep, loop seams, empty first frames, clipping, a symbol covered too long, uniform spreads, additive solids, flashing and several traps above (a trail child with rate 0, a death burst on an immortal parent). Fix every FAIL and WARN, run it again, then look.
 - **Did it fire, and where:** `render_layout` with `includeImage: false`, reading `liveParticlesByEmitter` and `contentBounds` at the beats.
+- **Does it draw in the editor:** `slotfx_capture_viewport` during playback. `render_layout` can stack layers differently from the editor; an opaque preview backdrop in the clip hid every particle in the editor while renders looked right.
+- **Checker scope (observed on 0.9.80):** `slotfx_check_particle_effect` with `clip` returned "No particle layers in clip" for every clip; `group` with `loop: true` worked, so check loop seams by eye with `render_layout` times on both sides of the clip end.
+- **Many copies:** no MCP tool runs N copies on a runtime. As a cheap projection, run the checker with its `budget` divided by N (for 10 copies: particles 40, fill 0.3). Large light quads dominate fill; share room or floor lights per scene instead of per copy.
 - **How it looks:** review entry, strongest beat and tail through natural playback in SlotVFX over the real background. Use captured frames only for a specific diagnostic or requested comparison.
 - **One-shots:** verify zero live particles at the intended completion, including any deliberate tail. A held or overlapping effect has a different stop contract.
 - **Loops:** inspect first frame and both sides of seams for visual continuity and expected population. Natural count variation or an intentional buildup is acceptable; a constant count alone does not prove a seamless loop.
