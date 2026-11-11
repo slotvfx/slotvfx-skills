@@ -23,7 +23,7 @@ e9a397e366cef9a2cec9eedfef9d8214d469908ed66775602777e1761123c14d  skills/slot-vf
 10ba37d6066d55690bf751a90686d0a4c05e7b0e891982433dab1561ec104219  skills/slot-vfx-motion-craft/references/spine-character-motion.md
 c1ab385c7993e197b95364fb3621f2181a14acdb20c334bb24e9c155e6b07925  skills/slot-vfx-motion-craft/references/workflows.md
 d910647c50700e45d0260d85743886ed064dc147d4014835c1578d087fffcac2  skills/slot-vfx-motion-craft/scripts/motion_keys.py
-6dc9fe753eb8e3a87476d2ccdd1c95f2d873f92a89fe78a38dcd68324e92a68a  skills/slot-vfx-particle-recipes/SKILL.md
+995e01052be11d1147afdd30c80937d98168257f64c2da6076b9f3c0f12798cb  skills/slot-vfx-particle-recipes/SKILL.md
 68e10ec45aa208ae6cc40dabf331f825bd094ac5e8f31e6435adb08a9ecb7ad8  skills/slot-vfx-particle-recipes/agents/openai.yaml
 e7a9952cb8f1ec18f31b3371959ac20add0e717ea448ee02d8a705bdf2f4b2d6  skills/slot-vfx-particle-recipes/references/workflows.md
 c3e78ee31a4005c91935c5d1f432ed279ca90830f390f17db82045445e118f13  skills/slot-vfx-per-cell-effects/SKILL.md
