@@ -30,13 +30,39 @@ One accepted call is one Undo step; a failing operation rejects the whole call. 
 
 ## Recorded showcases and export limits
 
-Set `editorOnly:true` deliberately before using music, beat grids, titles, marker ties or Blends. `crossfade` needs overlapping bars; `dip` uses bars before/after a cut. `setFade` affects a bar's layers or dips the frame to a colour. The editor calls these Blends; they are never live game transitions. Cleanup with `clearFades`, `untie` or `removeTitle` also works on game sequences; removing stored extras does not require enabling Editor only.
+Set `editorOnly:true` deliberately before using music, beat grids, titles, marker ties, media items or Blends. `crossfade` needs overlapping bars; `dip` uses bars before/after a cut. `setFade` affects a bar's layers or dips the frame to a colour. The editor calls these Blends; they are never live game transitions. Cleanup with `clearFades`, `untie` or `removeTitle` also works on game sequences; removing stored extras does not require enabling Editor only.
 
 Titles use sequence `at`, duration, normalized vertical `y`, pixel `size`, fill and outline. `font` is a project font ID/name; `null` uses the built-in font. Use the returned `titleId` for edits; `setFade` accepts it in `barId` too.
 
 `setMarkers` replaces the whole list, so preserve unrelated markers. `tieToMarker` binds a bar/title to a marker plus an offset; later marker moves move the tied item. Import sound into Assets before `setMusic {assetId,at}`. `assetId:null` removes music; `at` alone moves it. `setBeat` uses BPM and an offset in seconds into the music file of its first beat; `bpm:null` clears the grid. `findBeat` listens to assigned music through the desktop editor; read its result/diagnostics. The beat grid does not move bars automatically.
 
 Explicitly Editor only clips/sequences are excluded from games; a game sequence referencing such a source is blocked. Resolve `exportBlocker` without silently clearing restrictions. Automatic filtering of unused Video edit content is a separate export rule.
+
+## Media items and one blend model
+
+Check the connected sequence guide for `media`, `blends` and `videoEdits` first; older builds don't have them, and then the operations above are the whole surface.
+
+A trailer sequence can hold media items (loose video, images, text and sound) on media rows under its clip rows. Add them with `edit_trailer_document`, passing the sequence ID as `timelineId` (the Video edit `video`, `text` and `sound` operations; the media rows are made on the first edit). Read them back from `slotfx_edit_sequence` as `mediaItems`, with target IDs such as `image:<id>` and `audio:<id>`. Edit them with `editMedia`:
+
+```json
+{
+  "sequenceId": "showcase",
+  "operations": [
+    {"op": "editMedia", "action": "move", "targetId": "image:gameplay", "startTime": 2},
+    {"op": "editMedia", "action": "trim", "targetId": "image:gameplay", "startTime": 2, "endTime": 6},
+    {"op": "editMedia", "action": "split", "targetId": "image:gameplay", "at": 4}
+  ],
+  "dryRun": true
+}
+```
+
+A trim can reach into the source's handles. A video's own sound moves, trims and splits with its video. Split pieces stay on one row. `remove` takes the item off the sequence.
+
+Every blend, on bars and media items, is read from `sequence.blends`. Use `setBlend {kind, from, to?, duration?, color?, curve?}` with `kind` `fade-in`, `fade-out`, `crossfade` or `dip`; `setBlendCurve {blendId, curve}`; and `removeBlend {blendId}`. The two kinds of item can look different: on bars a colour fade or `dip` covers the whole frame, while on media items a crossfade mixes the two images and a fade goes to a colour on that item only. Media items have no `dip`. `setFade`, `crossfade` and `dip` still work.
+
+`tieToMarker` also accepts a media item (`barId: "image:<id>"`); the item then follows its marker. Moving a tied item keeps the tie with a new offset.
+
+A Video edit opened in the editor becomes a trailer sequence with a copy of its media; its cues become markers, and items that start exactly on a cue are tied to it. The original stays until the artist chooses Keep or Go back. For one release, the Video edit commands also accept the converted Video edit's ID and act on its sequence.
 
 ## Speed keys
 
@@ -63,4 +89,4 @@ Pass the returned `sequenceId` as `timelineId` to `slotfx_render_layout` or `slo
 
 Use per-job recorder settings, poll `lifecycleState` to `completed`, and verify/save the exact job when recording was requested. Save the editable project when persistence was requested. A successful preview or recording does not establish game-runtime parity.
 
-Game sequences and clip Speed maps support Pixi, Phaser, Cocos and WebGL2. Test the exported target when claiming parity. Supplied runtime instances bind to their original spawn lifetime; sequence stop preserves newer game-owned playback. Test repeat/stop and destroyed/reused instances when relevant. Do not present parked native artwork rigs or the proposed combined Sequence editor as shipped features.
+Game sequences and clip Speed maps support Pixi, Phaser, Cocos and WebGL2. Test the exported target when claiming parity. Supplied runtime instances bind to their original spawn lifetime; sequence stop preserves newer game-owned playback. Test repeat/stop and destroyed/reused instances when relevant. Do not present parked native artwork rigs as shipped features, or media items and the merged editor as available in a build whose sequence guide does not list them.
