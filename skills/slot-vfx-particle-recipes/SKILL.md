@@ -164,6 +164,12 @@ Target squashes, flashes and HUD bumps below are optional integration examples. 
 
 ## Textures
 
+- **Shared library first:** `slotfx_search_library` with `scopes: ["shared"]` searches the shared texture library (about 1,300 VFX textures: smoke, fire, flares, stars, sparks, rings, trails, LUTs, noise) by name, tag and category, with paging. `includeContactSheet: true` returns one numbered image of the page to choose from by eye; `matchQuality` `related` or `none` means nothing is named or tagged that way. `slotfx_get_library_item` (scope `shared`) gives pixel size, alpha type and a preview. Import with `slotfx_import_asset`, passing `libraryItemId` and a `colorMode`:
+  - `auto` (default) picks one of the modes below from the file.
+  - `alphaOnly`: white with the file's alpha, coloured by the layer's ramp. For grey art whose shading darkens towards the edges (most smoke puffs, sparks and flares), which otherwise draws a dark rim.
+  - `straight`: colour divided by alpha, for coloured art with dark fringes.
+  - `original`: the file as it is.
+  Importing the same item in the same mode again reuses the existing asset. Searches for coins, leaves, snowflakes, water drops and confetti found nothing suitable when this was written; make those. If the shared scope reports that it isn't connected (older app builds), make the texture as below.
 - **Colour:** white RGB with the shape in alpha. Colour comes from the layer's ramp. Shaded solids (chips, leaves, shards) carry their shading in grey RGB.
 - **Size a texture by its core, not its canvas.**
   - A line with a 1-texel core in a 16 px-tall texture vanishes at 3 px tall and reads cleanly at 11 px.

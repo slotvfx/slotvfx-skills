@@ -29,7 +29,7 @@ For an open direction, compare a few distinct silhouette/timing studies before r
 
 ## Assets and editable structure
 
-Reuse suitable project assets first. Generate a new texture only when it improves the requested look, using the available image workflow and its instructions. Simple readable cores often work better than detailed sprites at player scale.
+Reuse suitable project assets first, then the shared texture library (`slotfx_search_library` with `scopes: ["shared"]`, imported by `libraryItemId`; see [particle recipes](../slot-vfx-particle-recipes/SKILL.md#textures)). Generate a new texture only when it improves the requested look, using the available image workflow and its instructions. Simple readable cores often work better than detailed sprites at player scale.
 
 - Light textures such as glows, rings, streaks and dots can use white RGB with shape in alpha and color from the layer ramp, so one texture serves many effects and palettes.
 - Painted solids can retain their RGB shading with a neutral ramp that fades alpha. Do not wash out approved artwork to follow a universal white-texture rule.
