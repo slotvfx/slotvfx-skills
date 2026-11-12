@@ -3,6 +3,8 @@ name: create-vfx
 description: Create, inspect or revise editable particles, artwork, logo reveals and game effects directly in SlotVFX Desktop. Show the result in the editor using its existing clip, focus and playback tools.
 ---
 
+SlotVFX skills version: 0.9.12. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
+
 Use the connected SlotVFX tools; no source repository is needed. Start with `slotfx_get_app_state` and `slotfx_get_bridge_status`. If the bridge is unavailable, tell the user to open SlotVFX and turn on Help → Connect AI. Do not invent a connection or restart an app with unsaved work. If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
 
 For project creation/opening, use the app lifecycle tools and poll the returned operationId until terminal status, then wait for editorReady. Native save/discard/cancel dialogs are user decisions. Inspect the current project, hierarchy and clips before editing; preserve unrelated work. Resolve only missing visual decisions that matter (style, timing, target); use sensible defaults for a first draft.
