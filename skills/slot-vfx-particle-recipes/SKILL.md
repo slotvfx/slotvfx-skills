@@ -170,6 +170,8 @@ Target squashes, flashes and HUD bumps below are optional integration examples. 
   - Match the project's art style first: a realistic photo smoke in a flat cartoon game looks wrong however good the file is.
   - To match or replace an existing texture, `looksLikeAssetId` (a project asset, for example the layer's current texture) or `looksLikeItemId` (a library item) ranks results by likeness; `similarity` values compare results with each other, not with a fixed scale.
   - Open a contact sheet of the narrowed page, shortlist a few, check the best with `slotfx_get_library_item`, and say which one you picked and why.
+  - `noGoodMatch: true` means nothing is described that way; the results are loose matches. Keep the current texture or make one rather than taking them.
+- **Changing textures in an existing effect:** the effect's own textures often define its art style (drawn shapes, cel shading). Pass all of them as `looksLikeAssetId` so results stay consistent, change one layer at a time, compare the result with the original in the effect, and replace a texture only when the new one is clearly better for that layer. Keep fire, smoke and dust on different textures so the materials stay distinct; don't move a whole effect onto one texture family.
 - **Importing:** `slotfx_import_asset`, passing `libraryItemId` and a `colorMode`:
   - `auto` (default) picks one of the modes below from the file.
   - `alphaOnly`: white with the file's alpha, coloured by the layer's ramp. For grey art whose shading darkens towards the edges (most smoke puffs, sparks and flares), which otherwise draws a dark rim.
