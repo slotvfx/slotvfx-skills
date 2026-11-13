@@ -3,6 +3,10 @@ name: slot-vfx-performance
 description: "Investigate SlotVFX frame-rate or export-cost problems with controlled measurements in the actual target runtime. Compare realistic copy counts, simulation, draw calls, uploads, overdraw and baked alternatives."
 ---
 
+For requested key cleanup, use the separate **Optimize animation** preview/apply workflow for eligible SlotVFX or Spine tracks. Read [supported optimization, error units and pose protection](../slot-vfx-motion-craft/references/animation-review.md#optimize-animation-preview-then-apply); preserve skipped data and locked poses, inspect savings/error before Apply, then verify playback with Undo available.
+
+Use `slotfx_review_animation` (Timeline > Review animation) for key density, serialized/gzip animation data, shared curve payloads, texture budgets, native Spine data and runtime delivery issues. Read [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md). Profiles are adjustable starting budgets; retain intentional dense motion. This static review complements target-runtime measurements and does not measure device FPS.
+
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.
 
 # Measuring SlotVFX performance

@@ -3,6 +3,8 @@ name: motion-sequence
 description: Author SlotVFX Timeline Director sequences and trailers with clip bars, music, beats, titles, Blends and Speed keys; use Scene Animator and recorder scenarios for event-driven flows.
 ---
 
+For clips delivered to a game, use [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md) and `slotfx_review_animation`. Editor-only sequences/recordings have different delivery rules. Recording at 60 fps does not require 60 authored keys per second.
+
 Inspect the scene, existing clips, state machine and any trailer document. Use a clip for one animation, Timeline Director for a fixed arrangement of existing clips, Scene Animator for event-driven states, or a recorder scenario to demonstrate those events. When the connected `slotfx://authoring-guide/sequences` describes `media`, `blends` and `videoEdits`, Video edits are trailer sequences: loose video, images, text and sound go on a trailer sequence's media rows, and older Video edits convert to sequences when opened. Do not convert every sequence into a logo reveal or rebuild the editor externally.
 
 Read [Timeline Director and Speed-key workflows](references/timeline-director.md) for arrangements, recorded showcases, music/beat grids, title cards, Blends, slow motion and game-export boundaries. Read the live resources `slotfx://authoring-guide/sequences`, `slotfx://authoring-guide/slow-motion` and `slotfx://authoring-guide/recording`. These describe the 0.9.80 tool surface; resolve actual clip and asset IDs before authoring.
