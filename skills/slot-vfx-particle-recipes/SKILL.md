@@ -164,7 +164,13 @@ Target squashes, flashes and HUD bumps below are optional integration examples. 
 
 ## Textures
 
-- **Shared library first:** `slotfx_search_library` with `scopes: ["shared"]` searches the shared texture library (about 1,300 VFX textures: smoke, fire, flares, stars, sparks, rings, trails, LUTs, noise) by name, tag and category, with paging. `includeContactSheet: true` returns one numbered image of the page to choose from by eye; `matchQuality` `related` or `none` means nothing is named or tagged that way. `slotfx_get_library_item` (scope `shared`) gives pixel size, alpha type and a preview. Import with `slotfx_import_asset`, passing `libraryItemId` and a `colorMode`:
+- **Shared library first:** `slotfx_search_library` with `scopes: ["shared"]` searches the shared texture library (about 1,300 VFX textures: smoke, fire, flares, stars, sparks, rings, trails, LUTs, noise) by name, tag and category, with paging. `includeContactSheet: true` returns one numbered image of the page to choose from by eye; `matchQuality` `related` or `none` means nothing is named or tagged that way. `slotfx_get_library_item` (scope `shared`) gives pixel size, alpha type and a preview.
+- **Choosing one:** a family such as smoke has well over a hundred files, so choose rather than take the first hit.
+  - Where results carry `look` (newer app builds and a described library), read `look.summary`, `style`, `goodFor` and `notFor`. Search in effect words ("cartoon poof", "soap bubble", "cell highlight frame") and filter with `look`: `style` (cartoon, realistic, painterly, pixel, graphic), `shapes`, `edges`, `detail`, `colour`, `readsSmall`, `animated`. Items not described yet are left out of style filters and counted in a warning; search by name or tags to include them.
+  - Match the project's art style first: a realistic photo smoke in a flat cartoon game looks wrong however good the file is.
+  - To match or replace an existing texture, `looksLikeAssetId` (a project asset, for example the layer's current texture) or `looksLikeItemId` (a library item) ranks results by likeness; `similarity` values compare results with each other, not with a fixed scale.
+  - Open a contact sheet of the narrowed page, shortlist a few, check the best with `slotfx_get_library_item`, and say which one you picked and why.
+- **Importing:** `slotfx_import_asset`, passing `libraryItemId` and a `colorMode`:
   - `auto` (default) picks one of the modes below from the file.
   - `alphaOnly`: white with the file's alpha, coloured by the layer's ramp. For grey art whose shading darkens towards the edges (most smoke puffs, sparks and flares), which otherwise draws a dark rim.
   - `straight`: colour divided by alpha, for coloured art with dark fringes.
