@@ -3,6 +3,10 @@ name: slot-vfx-motion-craft
 description: Write how a SlotVFX effect or Spine character moves — eases, springs, scale pops, staggers, beats, win escalation, loops, Spine body mechanics, breathing and overlap — as exact keys, and check Spine keys for broken motion. Use with the build skills whenever something animates.
 ---
 
+For requested key cleanup, use the separate **Optimize animation** preview/apply workflow for eligible SlotVFX or Spine tracks. Read [supported optimization, error units and pose protection](../slot-vfx-motion-craft/references/animation-review.md#optimize-animation-preview-then-apply); preserve skipped data and locked poses, inspect savings/error before Apply, then verify playback with Undo available.
+
+For game animation generation, Spine edits and Bend / Warp, read [animation review and budgets](references/animation-review.md). Use the app/MCP shared `slotfx_review_animation` for the intended target and inspect `get_timeline.gameAnimation`; preserve locked poses, events, contacts and loop seams when comparing a simpler representation.
+
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.
 
 # Motion craft for slot VFX
@@ -82,7 +86,7 @@ For a spring that starts at rest, the first overshoot is exp(−ζπ / √(1−�
 - Win symbol pop, big-win banner slam: ζ 0.5–0.65, response 0.35–0.5 s.
 - Logo lockup, final settle of a reveal, UI: ζ 0.85–1.0, response 0.4–0.6 s.
 
-**Write springs as keys with the script (tested).** `scripts/motion_keys.py spring` places keys at the start, every peak, every crossing of the target and the end, fits bezier handles, and splits any segment that misses by more than 0.25% of the travel. ζ 0.65, response 0.4 s over 1,000 px became 7 keys. SlotVFX's evaluated positions stayed within 0.4 px of the closed-form spring, and within 1.7 px in the last 0.1 s, where the script hands over to the exact target. `--sampled` writes linear keys at 60 fps instead (the spin-showcase method); use it when keys must be dense anyway.
+**Write springs as keys with the script (tested).** `scripts/motion_keys.py spring` places keys at the start, every peak, every crossing of the target and the end, fits bezier handles, and splits any segment that misses by more than 0.25% of the travel. ζ 0.65, response 0.4 s over 1,000 px became 7 keys. SlotVFX's evaluated positions stayed within 0.4 px of the closed-form spring, and within 1.7 px in the last 0.1 s, where the script hands over to the exact target. `--sampled` writes linear keys at 60 fps instead (the spin-showcase method); use it only when deliberate dense sampling is needed and justified by the motion/error comparison; output video FPS alone is not a reason.
 
 - `--v0` starts the spring with a velocity (value units per second), for something that arrives moving, like a reel.
 - Don't hand-key a mid-state such as scale 1.1 on top of a spring or `back.out`. The curve already overshoots; an extra key double-bounces.
