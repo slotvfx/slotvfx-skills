@@ -7,7 +7,7 @@ For requested key cleanup, use the separate **Optimize animation** preview/apply
 
 For game animation creation or delivery, run `slotfx_review_animation` with the intended clip ID, target, profile and copies. Read [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md); `get_timeline.gameAnimation` adds authoring warnings. The review is read-only and does not simplify keys or change locked marker poses.
 
-SlotVFX skills version: 0.9.13. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
+SlotVFX skills version: 0.9.14. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request. If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
 
@@ -39,7 +39,7 @@ From 0.9.50, Image FX references such as `get_feature_schema { featureId: "image
 
 Read back any nested config object after writing it (`get_entity`) and check a field omitted from the patch. Older builds replaced `particle.subEmitterConfig`, an open map rather than a declared settings group, on partial writes: writing seven size keys to a trail child dropped eighteen others, including texture, gravity, color ramp, emission rate, lifespan, speed and blend mode, while the reply's `changedKeys` listed every key of the object and so looked like a normal write. The pack reports merging from 0.9.47, but the reply still does not show which behavior you got. Keep the original full object so a mistaken replacement can be repaired by writing the whole object back with the change folded in.
 
-If an authorized target is locked, remember its lock state, unlock, edit and relock. A patch naming a locked layer fails, and the message includes the unlock call. Older builds required separate calls: unlock and relock in the same patch was refused as a duplicate edit. Do not broaden the edit to other locked layers.
+If an ordinary, authorized layer edit requires unlocking that layer, remember its lock state, unlock, edit and relock; do not extend this to other layers or to marker pose/timing locks. **Optimize animation preserves existing layer/group and marker locks:** a request to optimize alone does not authorize unlocking them. Report skipped tracks or Apply refusals instead. If the user explicitly requests changing a particular lock, use that lock's own workflow and get a fresh optimization preview after the change. Older builds require separate unlock and relock calls; combining them in one patch can be refused as a duplicate edit.
 
 ## Clip membership and animation
 

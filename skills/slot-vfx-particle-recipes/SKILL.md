@@ -177,7 +177,7 @@ Target squashes, flashes and HUD bumps below are optional integration examples. 
   - `straight` divides RGB by alpha for premultiplied coloured art; inspect any reported clamping or edge changes.
   - `alphaOnly` replaces visible RGB with white and keeps alpha so the layer's tint/ramp supplies colour. It removes RGB shading; use it for a tintable mask, not simply because a texture is grey.
   Importing the same item in the same mode reuses its existing project asset. If file inspection fails, `auto` can retain the original with a warning; this does not verify its alpha treatment. Judge the actual imported texture before applying the choice across an effect.
-- **Colour:** white RGB with the shape in alpha. Colour comes from the layer's ramp. Shaded solids (chips, leaves, shards) carry their shading in grey RGB.
+- **Colour:** intentionally tintable masks use white RGB with the shape in alpha, so the layer's ramp supplies colour. Other textures retain their authored material colours, intentional dark smoke and RGB shading. Shaded solids (chips, leaves, shards) can keep grey RGB shading for tinting; do not whiten them into flat silhouettes.
 - **Size a texture by its core, not its canvas.**
   - A line with a 1-texel core in a 16 px-tall texture vanishes at 3 px tall and reads cleanly at 11 px.
   - A dot whose bright core is 22% of its size needs 18–22 px to show as a 4–5 px speck.
