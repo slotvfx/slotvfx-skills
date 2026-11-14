@@ -41,7 +41,9 @@ For Codex, install **all 20** `skills/<name>` folders into your Codex skills dir
 
 ## Sequence authoring and visual review
 
-The updated authoring guidance covers the 0.9.80 tool contract: Timeline Director clip arrangements, Speed keys, sequence recording and game-export limits, plus protected Spine pose workflows. See [Timeline Director and Speed keys](skills/motion-sequence/references/timeline-director.md); use the connected build's schemas for its actual capabilities.
+The sequence guidance covers the 0.9.80 tool contract: Timeline Director clip arrangements, Speed keys, sequence recording and game-export limits, plus protected Spine pose workflows. See [Timeline Director and Speed keys](skills/motion-sequence/references/timeline-director.md); use the connected build's schemas for its actual capabilities.
+
+Skills 0.9.13 adds [safe-track Spine optimization](skills/slot-vfx-motion-craft/references/animation-review.md#optimize-animation-preview-then-apply) and [texture selection](skills/slot-vfx-particle-recipes/SKILL.md#textures) guidance for app 0.9.84. Keep physics/slider dependencies and locked poses intact; inspect texture roles, verified usage advice, reference matches and metadata coverage. Skills and app version numbers are separate; use the connected app's schemas for availability.
 
 For effects that read poorly or an open visual direction, [visual critique and coordinated effects](skills/create-vfx/references/visual-critique.md) connects visible problems to focused adjustments, compares meaningful drafts and aligns effects with actor/symbol cues. It preserves approved styles, animation, sustained holds and the requested scope.
 

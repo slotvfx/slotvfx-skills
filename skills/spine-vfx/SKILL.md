@@ -3,7 +3,7 @@ name: spine-vfx
 description: Prepare and revise effects on existing Spine actors in SlotVFX, including bone or slot particle attachment, loop review, sprite plates and recorded or runtime delivery.
 ---
 
-For requested key cleanup, use the separate **Optimize animation** preview/apply workflow for eligible SlotVFX or Spine tracks. Read [supported optimization, error units and pose protection](../slot-vfx-motion-craft/references/animation-review.md#optimize-animation-preview-then-apply); preserve skipped data and locked poses, inspect savings/error before Apply, then verify playback with Undo available.
+For requested key cleanup, use the separate **Optimize animation** preview/apply workflow for eligible SlotVFX or Spine tracks, including independent bone tracks on physics/slider rigs in app 0.9.84 and newer. Read [supported optimization, error units and pose protection](../slot-vfx-motion-craft/references/animation-review.md#optimize-animation-preview-then-apply); preserve skipped data and locked poses, inspect savings/error before Apply, then verify playback with Undo available.
 
 For native animation size and game budgets, read [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md). Run `slotfx_review_animation` for the clip and target; Spine Performance also reports key counts, animation/deform JSON, unique atlas memory and configurable page-side budgets. Bone/constraint curves can be cheaper than dense deform offsets when visually equivalent; sparse offset encoding and necessary deformation must be preserved. Whole Character FX is disabled in the 0.9.82 app profile; use supported attachment FX or explicitly requested rendered capture.
 
@@ -53,7 +53,7 @@ Identify release/contact and recovery in the existing animation, verify the atta
 
 ## Protected poses, gaps and direct bone posing
 
-For the 0.9.80 pose-plan workflow, read `localPoseGapWorkflow` and `localBonePosing` in `slotfx://authoring-guide/spine-animation`. Use the live schemas for `slotfx_get_spine_pose_plan`, `slotfx_edit_spine_pose_plan`, `slotfx_edit_spine_pose_gap` and `slotfx_set_spine_pose_preview`. This enrolled local-only Spine 4.2 profile requires fixed skin, isolated track 0 and no physics; it does not extend general animation proposals to every rig/version or cloud project.
+For the 0.9.80 pose-plan workflow, read `localPoseGapWorkflow` and `localBonePosing` in `slotfx://authoring-guide/spine-animation`. Use the live schemas for `slotfx_get_spine_pose_plan`, `slotfx_edit_spine_pose_plan`, `slotfx_edit_spine_pose_gap` and `slotfx_set_spine_pose_preview`. This enrolled local-only Spine 4.2 profile requires fixed skin, isolated track 0 and no physics; it does not extend general animation proposals to every rig/version or cloud project. These pose-plan enrollment limits are separate from Optimize animation's support for independent tracks on physics/slider rigs.
 
 Read the current layer/animation/skin, exact canonical times, approvals and project/revision/source/plan context tokens before edits. Gap candidates belong strictly between approved pose-and-timing-locked endpoints. Use deliberate `prepareBoundary` only when requested, then read fresh tokens. `propose` or `stageReturn` stages a candidate; preview it without applying source edits. Applying requires the artist's explicit Apply request, the exact candidate digest and fresh context tokens. Preserve protected endpoints and outside-gap data; respect refusal diagnostics instead of routing around them.
 
