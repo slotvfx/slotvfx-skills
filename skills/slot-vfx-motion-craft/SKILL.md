@@ -21,6 +21,10 @@ Lines marked **(tested)** were measured in SlotVFX 0.9.59 through the MCP. Every
 
 For whole-clip speed changes use `slotfx_set_clip_slow_motion` and read `slotfx://authoring-guide/slow-motion`. Speed keys drive all layers on one clock; retain ordinary property keys for the motion's shape. Inspect `clipDuration` versus `playedDuration`, clip frame rate and `slowDownSound`. Pitch follows rate when sound follows the clip; normal-rate sound is an explicit option. Sequence bar speed is a separate constant multiplier. Read [Timeline Director and Speed keys](../motion-sequence/references/timeline-director.md) for arrangements and recording; re-read bar endpoints after changing source Speed keys.
 
+## Choose the motion route before writing keys
+
+For particles or emitters travelling along a fixed route, straight or curved, prefer a normal path over a chain of X/Y keys. Use configurable A-to-B endpoints only when the game or caller needs to choose the launch and destination points. Keep the route separate from traversal speed/easing, and choose whether the particle travels or its emitter moves and leaves particles behind. Use keys for opacity, emission and other supported properties; retain velocity/forces for free ballistic motion, real weapon/bone drivers and approved keyed trajectories. See [choosing a travel driver](../slot-vfx-travel-effects/SKILL.md#choose-the-travel-driver). A path is an authoring choice, not a performance or export-parity guarantee.
+
 ## 1. How SlotVFX evaluates a key
 
 **A key pair with `free` tangents is a CSS / After Effects cubic-bezier (tested).** Sampled positions matched `cubic-bezier(0.25, 1, 0.5, 1)` and `back.out` to 0.01 px. So for a segment from key A (time t0, value v0) to key B (t1, v1) and a named ease `(x1, y1, x2, y2)`:

@@ -9,7 +9,7 @@ For game animation creation or delivery, run `slotfx_review_animation` with the 
 
 Create effects autonomously using suitable project assets, built-in shapes and textures you generate or draw. Use project/private scopes for library tools. The shared texture library is a manual user feature, unavailable to AI: do not browse it, import from it or ask users to choose textures. Use `slotfx_create_texture` or supported image imports for missing artwork and continue the effect.
 
-SlotVFX skills version: 0.9.15. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
+SlotVFX skills version: 0.9.16. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request. If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
 

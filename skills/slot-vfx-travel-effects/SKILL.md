@@ -1,13 +1,26 @@
 ---
 name: slot-vfx-travel-effects
-description: "Create re-aimable SlotVFX travel effects such as zaps, pulses and orbs. Coordinate the moving head, riders, trails and impact, then verify instance IDs, coordinate spaces and arrival in the game runtime."
+description: "Create or revise SlotVFX travel effects such as zaps, pulses and orbs. Coordinate the moving head, riders, trails and impact, then verify instance IDs, coordinate spaces and arrival in the game runtime."
 ---
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.
 
 # Travel effects
 
-For a single projectile or pulse, put A-to-B motion on one head and let companions follow it; in the usual arrangement A is the head's emitter position and B its Target Point. The game usually decides A and B at spin time, so moving the head's two points should re-aim the whole effect in one call. This is a useful synchronization pattern, not a restriction against intentionally separate or branching heads. Preserve the requested look and existing versions.
+Use one movement driver for a projectile, pulse or moving emitter, and let its intended companions follow it. A normal path is sufficient for a fixed route. Preserve the requested look and existing versions; use multiple drivers only when the effect intentionally has separate or branching heads.
+
+## Choose the travel driver
+
+For particles or emitters travelling along a fixed route, straight or curved, prefer a normal path over many X/Y position keys. The path defines where travel goes; duration, speed and a progress curve define when it gets there.
+
+Use A-to-B controls only when the game or caller must configure the launch and destination points, such as travel between changing board cells. In that case, put the configurable route on the head and make its companions follow the same driver. Reusing an effect does not by itself require configurable endpoints.
+
+Choose what follows the route:
+
+- **Travelling particle/head:** the particle moves along the route; a projectile, pulse or orb can carry riders and leave a trail.
+- **Travelling emitter:** the source moves along the route and emits a wake. For particles meant to stay where born, choose world space and the intended follow-release behavior. Moving the source does not require old particles to follow it.
+
+Inspect the installed path and `emitterFollowsPath` controls; assigning `pathId` alone does not prove which behavior is active. Use one travel driver rather than independently keying the same movement as well. Keep keys for emission/opacity and deliberate positional beats; retain velocity/forces for free ballistic motion, real weapon/bone attachments and existing approved trajectories. Do not convert approved effects solely to adopt a path. This choice controls movement, not the effect's visual construction, and does not establish performance or runtime parity.
 
 ## Connect the moving parts
 
@@ -31,6 +44,8 @@ Treat these as version-specific leads. Do not copy legacy size hacks or unsuppor
 
 ## Re-aim the correct live instance
 
+This section applies to effects with configurable endpoints. A fixed path does not require an A-to-B setup or a re-aiming API.
+
 Read the installed runtime's public API, including `setTravelPoints` if present (the pack's runtime had `setTravelPoints(layerId, from, to, bendSide)`). Resolve the head's template ID from the authored group/manifest, then resolve the corresponding **instance** element ID; in the pack's runtime, `getGroupElementIds(instanceId)` listed them, and a copy's layer IDs carried a suffix such as `__manual_runtime__1`. Do not hardcode an ID from another game or invent suffix parsing when the runtime exposes a mapping.
 
 A successful write to a template is not proof a live copy moved: in the pack's runtime a bare template ID wrote the template, returned `true`, and the copy on screen kept its old route. Confirm readback or visible movement on the intended instance.
@@ -43,6 +58,13 @@ Do not move a head container to A as well as setting local travel points unless 
 
 ## Verify several routes
 
-In the editor, `get_timeline` with `motion: { targetIds, timesSeconds }` samples the head's evaluated position, direction and speed, which checks bend, speed and arrival time before the runtime test. `move_effect` shifts the head's A-to-B target and handles with it, so moving the whole effect keeps the route. Render early flight, mid-flight and impact, checking the companions are with the head at each, then aim to a second destination. Anything left behind has its own path or target and should become a follower. In the runtime, include left/right travel and a late-started instance away from the template origin. Add transformed-parent tests if the game uses them.
+Choose the motion check for the actual travel driver:
 
-Measure the arrival against B in a common coordinate space. Error within deliberate spawn spread (a few px in the pack's tests) may be correct; a large systematic offset (tens or hundreds of px) suggests an origin, instance-ID or follower-space problem. Check the full trail and impact remain attached, the flight duration is correct, and stopping/reusing the instance leaves no old particles behind.
+- **Moving emitter:** `get_timeline` with `motion: { targetIds, timesSeconds }` reports the emitter/source trajectory (`kind: "emitterHead"`), including supported emitter-follow-path motion. Inspect the returned `supported` flag and kind before using its positions, direction or speed.
+- **Travelling particles:** that same probe still measures their emitter; it does not track individual simulated particles. Advance the particle simulation and inspect rendered frames or a known particle's positions at known ages to verify its route, speed and arrival. A stationary emitter sample is expected when the particles travel away from it; it does not mean the particles stopped.
+
+Render early flight, mid-flight and impact; check the intended companions stay with the head and the released wake stays behind as designed. Verify the fixed path's shape, traversal speed and endpoint in the native runtime, including a late-started instance away from the template origin. Add transformed-parent tests if the game uses them.
+
+For configurable A-to-B effects, also aim to a second destination and include left/right travel. `move_effect` shifts the head's A-to-B target and handles with it, so moving the whole effect keeps the route. A companion intended to ride the head should share its driver rather than retain an independent path or target.
+
+Measure arrival against the path endpoint, or B for a configurable A-to-B effect, in a common coordinate space. Error within deliberate spawn spread (a few px in the pack's tests) may be correct; a large systematic offset (tens or hundreds of px) suggests an origin, instance-ID or follower-space problem. Check the full trail and impact remain attached, the flight duration is correct, and stopping/reusing the instance leaves no old particles behind.

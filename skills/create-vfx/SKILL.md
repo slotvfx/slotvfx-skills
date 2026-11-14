@@ -5,7 +5,7 @@ description: Create, inspect or revise editable particles, artwork, logo reveals
 
 For game animation generation or delivery, read [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md). Use sparse curves and the selected runtime’s supported representation, then run `slotfx_review_animation` for the intended clip and copy count; review warnings without deleting artist keys automatically.
 
-SlotVFX skills version: 0.9.15. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
+SlotVFX skills version: 0.9.16. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
 
 Use the connected SlotVFX tools; no source repository is needed. Start with `slotfx_get_app_state` and `slotfx_get_bridge_status`. If the bridge is unavailable, tell the user to open SlotVFX and turn on Help → Connect AI. Do not invent a connection or restart an app with unsaved work. If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
 
