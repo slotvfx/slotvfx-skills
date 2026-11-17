@@ -26,7 +26,7 @@ Keep source skeletons/atlases and original artwork intact. Confirm the user's ri
 
 ## Play Spine animations in a sequence
 
-To show a character's actions in order (idle → anticipation → win), or to arrange Spine animations with effect clips in a video, use Spine animation bars on a Timeline Director sequence rather than keying animation switches inside one clip. Mixes between bars play in games too. Read [Spine animation bars](../motion-sequence/references/timeline-director.md#spine-animation-bars) and check the connected sequence guide lists `spineBars` first.
+To show a character's actions in order (idle → anticipation → win), or to arrange Spine animations with effect clips in a video, use Spine animation bars on a Timeline Director sequence rather than keying animation switches inside one clip. Mixes between bars play in games too. When a game event decides which animation plays next, use states (Scene Animator or the group animator) instead of a fixed sequence. Read [Spine animation bars](../motion-sequence/references/timeline-director.md#spine-animation-bars) and check the connected sequence guide lists `spineBars` first.
 
 ## Add or edit Spine animations
 

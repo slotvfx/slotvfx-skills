@@ -1,6 +1,6 @@
 ---
 name: slotvfx-showcase-video
-description: "Record requested SlotVFX clips or state-machine scenarios through MCP, verify true frame rate and loop behavior, save files reliably, and combine or deliver videos when requested. Supports named timelines and repeated cycles in 0.9.50."
+description: "Record requested SlotVFX clips, Timeline Director sequences or state-machine scenarios through MCP, verify true frame rate and loop behavior, save files reliably, and combine or deliver videos when requested. A video with more than one shot is built as a sequence of shot clips first."
 ---
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request.

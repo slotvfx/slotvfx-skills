@@ -156,7 +156,6 @@ For keyed layers, give each layer a different whole number of cycles per clip, s
 
 In a trailer each shot is its own clip on a Timeline Director sequence; these cut rules apply to its bars and Blends ([one clip or a sequence](../motion-sequence/SKILL.md#one-clip-or-a-sequence)).
 
-
 - **Velocity-matched cut:** exit with an `.in` ease and enter with the `.out` of the same family. Both pass through the cut at the same speed when distance divided by duration is equal on each side. For `power2` the speed at the cut is about 3× the average speed.
 - **A transition** that overlaps two scenes shortens the total by the overlap. **An overlay** (light leak, flash) sits centred on the cut and adds no time.
 
