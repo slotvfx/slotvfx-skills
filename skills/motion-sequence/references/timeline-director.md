@@ -7,12 +7,12 @@ This covers the 0.9.80 tool contract. Read connected schemas and `slotfx://autho
 When a request has more than one moment (a video, trailer, LinkedIn or social post, showcase reel, several logo reveals, spin → anticipation → win demo, before/after), the sequence is the plan, not an afterthought:
 
 1. Write a shot list: each shot's job, length and the beat it lands on. A typical 30 s social video: a 1.5–2 s hook (a trimmed bar of the best moment), 4–5 effect shots of 3–5 s, a short end card. Fit the user's brief over this example.
-2. Reuse approved clips for shots that already exist. Build each missing shot as its own short clip that starts at 0 and holds only that shot's layers (explicit membership). Everything that happens inside one moment stays in that shot's clip.
+2. Reuse approved clips for shots that already exist. Build each missing shot as its own short clip that starts at 0 and holds only that shot's layers (explicit membership). Everything that happens inside one moment stays in that shot's clip. Sequences don't nest, so a shot is always a clip, never another sequence.
 3. Create an Editor only sequence for a video. Place the shots with `addBar` at explicit times, trim with `clipIn`/`clipOut`, repeat with another bar or `loopCount`, and change pace with bar `speed` or the source clip's Speed keys.
 4. Put music, beat grid, title cards, markers and Blends on the sequence, not inside the shot clips. Use Spine animation bars for a character's actions.
 5. Read back the resolved bars and overlaps, review in the editor and record the sequence ID as `timelineId`.
 
-Two shots that animate the same layer must not overlap unless that is intended; read `overlaps`. Keep a single clip when the brief is truly one continuous moment; one clip played several times is a sequence with repeated bars, not a longer clip.
+Two shots that animate the same layer must not overlap unless that is intended; read `overlaps`. When shots share layers (the same board, symbols or character), check both sides of every cut in the editor: a layer the next shot doesn't key can jump to a different position, scale or visibility at the cut. Key the starting state in the next shot, or give each shot its own layers. Keep a single clip when the brief is truly one continuous moment; one clip played several times is a sequence with repeated bars, not a longer clip.
 
 ## Choose and arrange
 
