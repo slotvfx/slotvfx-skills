@@ -31,7 +31,7 @@ For a detailed recipe with historical timings, masks, strip fitting and a cell-s
 
 ## Clips, states and verification
 
-Use separate idle, spin and win clips when appropriate. Define actual trigger names from the existing game integration. Inspect the base timeline that may play under state clips and keep it neutral when needed. Use current transition editing tools rather than duplicating obsolete edges.
+Use separate idle, spin and win clips when appropriate. For a fixed showcase video of spin → anticipation → wins, arrange those clips on an Editor only Timeline Director sequence rather than one long clip; use Scene Animator and a recorder scenario when the game's trigger flow itself is being shown. See [one clip or a sequence](../motion-sequence/SKILL.md#one-clip-or-a-sequence). Define actual trigger names from the existing game integration. Inspect the base timeline that may play under state clips and keep it neutral when needed. Use current transition editing tools rather than duplicating obsolete edges.
 
 Follow the [MCP authoring workflow](../slotvfx-mcp-authoring/SKILL.md) for bounded key replacement, readback, locks and membership. Save substantial completed stages and preserve recovery snapshots.
 

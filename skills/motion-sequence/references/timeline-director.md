@@ -2,6 +2,18 @@
 
 This covers the 0.9.80 tool contract. Read connected schemas and `slotfx://authoring-guide/sequences`, `slotfx://authoring-guide/slow-motion` and `slotfx://authoring-guide/recording`. If they are missing, check app/MCP compatibility rather than inventing fields. Resolve actual clip, bar and asset IDs.
 
+## Plan shots, then assemble
+
+When a request has more than one moment (a video, trailer, LinkedIn or social post, showcase reel, several logo reveals, spin → anticipation → win demo, before/after), the sequence is the plan, not an afterthought:
+
+1. Write a shot list: each shot's job, length and the beat it lands on. A typical 30 s social video: a 1.5–2 s hook (a trimmed bar of the best moment), 4–5 effect shots of 3–5 s, a short end card. Fit the user's brief over this example.
+2. Reuse approved clips for shots that already exist. Build each missing shot as its own short clip that starts at 0 and holds only that shot's layers (explicit membership). Everything that happens inside one moment stays in that shot's clip.
+3. Create an Editor only sequence for a video. Place the shots with `addBar` at explicit times, trim with `clipIn`/`clipOut`, repeat with another bar or `loopCount`, and change pace with bar `speed` or the source clip's Speed keys.
+4. Put music, beat grid, title cards, markers and Blends on the sequence, not inside the shot clips. Use Spine animation bars for a character's actions.
+5. Read back the resolved bars and overlaps, review in the editor and record the sequence ID as `timelineId`.
+
+Two shots that animate the same layer must not overlap unless that is intended; read `overlaps`. Keep a single clip when the brief is truly one continuous moment; one clip played several times is a sequence with repeated bars, not a longer clip.
+
 ## Choose and arrange
 
 Use a clip for one animation, Timeline Director for a fixed arrangement of clips, Scene Animator for event-driven states, or a recorder scenario to demonstrate those triggers. A scenario plays its state clips independently of the editing clip; no blank base clip is required.
@@ -37,6 +49,26 @@ Titles use sequence `at`, duration, normalized vertical `y`, pixel `size`, fill 
 `setMarkers` replaces the whole list, so preserve unrelated markers. `tieToMarker` binds a bar/title to a marker plus an offset; later marker moves move the tied item. Import sound into Assets before `setMusic {assetId,at}`. `assetId:null` removes music; `at` alone moves it. `setBeat` uses BPM and an offset in seconds into the music file of its first beat; `bpm:null` clears the grid. `findBeat` listens to assigned music through the desktop editor; read its result/diagnostics. The beat grid does not move bars automatically.
 
 Explicitly Editor only clips/sequences are excluded from games; a game sequence referencing such a source is blocked. Resolve `exportBlocker` without silently clearing restrictions. Automatic filtering of unused Video edit content is a separate export rule.
+
+## Spine animation bars
+
+Check the connected sequence guide for `spineBars` and the readback for `availableSpines` first; older builds don't have them.
+
+A Spine animation bar plays one animation of a Spine layer directly, without a clip: `addSpineBar {spine (ID or name), animation, track?, at, clipIn?, clipOut?, loopCount?, speed?, mix?}`. Each Spine gets one row per track: track 0 is the main row, and a blink on track 1 plays over the idle on track 0, winning only the bones it keys. Place a row's bars back to back; where they touch or overlap they mix (default 0.2 s or the overlap). `setMix {barId, mix}` sets it in seconds (0 = cut, `null` = default). Mixes play in games too, unlike Blends.
+
+Use them for a character's performance (idle → anticipation → win → idle) instead of keying animation switches inside a clip. A clip bar can still move or fade the same Spine; if it also keys that Spine's animation, the Spine bar wins and `overlaps` reports it. Read `bars[].spine.missing` (renamed or deleted animation, or the Spine moved into a game object; those bars play nothing and leave export) and `bars[].spine.lengthChange` (after a Spine file replace the bar keeps its old length until `useNewLength {barId}`). Game-object Spines are refused.
+
+```json
+{
+  "sequenceId": "hero-showcase",
+  "operations": [
+    {"op": "addSpineBar", "spine": "Hero", "animation": "idle", "barId": "hero-idle", "at": 0},
+    {"op": "addSpineBar", "spine": "Hero", "animation": "win", "barId": "hero-win", "at": 1.2, "mix": 0.25},
+    {"op": "addSpineBar", "spine": "Hero", "animation": "blink", "track": 1, "barId": "hero-blink", "at": 0.5}
+  ],
+  "dryRun": true
+}
+```
 
 ## Media items and one blend model
 

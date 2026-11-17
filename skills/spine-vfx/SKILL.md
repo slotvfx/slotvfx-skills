@@ -24,6 +24,10 @@ Before exporting a Spine layer for a game, run `slotfx_check_spine_export`; `slo
 
 Keep source skeletons/atlases and original artwork intact. Confirm the user's right to use the assets and runtime license requirements when selecting a delivery. Do not infer general Spine runtime parity from one successful editor render.
 
+## Play Spine animations in a sequence
+
+To show a character's actions in order (idle → anticipation → win), or to arrange Spine animations with effect clips in a video, use Spine animation bars on a Timeline Director sequence rather than keying animation switches inside one clip. Mixes between bars play in games too. Read [Spine animation bars](../motion-sequence/references/timeline-director.md#spine-animation-bars) and check the connected sequence guide lists `spineBars` first.
+
 ## Add or edit Spine animations
 
 These tools exist only in SlotVFX builds that ship them. If `slotfx_get_spine_rig` is not in the tool list, tell the user to update SlotVFX to the latest release. Do not hand-edit the skeleton JSON instead.

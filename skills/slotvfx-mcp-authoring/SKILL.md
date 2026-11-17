@@ -9,7 +9,7 @@ For game animation creation or delivery, run `slotfx_review_animation` with the 
 
 Create effects autonomously using suitable project assets, built-in shapes and textures you generate or draw. Use project/private scopes for library tools. The shared texture library is a manual user feature, unavailable to AI: do not browse it, import from it or ask users to choose textures. Use `slotfx_create_texture` or supported image imports for missing artwork and continue the effect.
 
-SlotVFX skills version: 0.9.16. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
+SlotVFX skills version: 0.9.17. If `slotfx_get_bridge_status` shows a newer `skills.latestVersion`, tell the user once that a SlotVFX skills update is available and how to update (`skills.howToUpdate`).
 
 Use the bundled [current workflow guide](references/workflows.md) for SlotVFX desktop review, tool routes, recovery and delivery contract. Older version-specific observations below are historical leads; inspect the running app’s schemas before relying on them. Review editable results in SlotVFX by activating the intended clip, framing/selecting the effect and playing it naturally. Save, record, export, publish or send reports only within the user’s request. If no `slotfx_` tools are available at all, SlotVFX isn't connected to Claude Code yet; say so plainly instead of attempting the work, and help the user connect it with [Connect SlotVFX](../slotvfx-mcp-authoring/references/connect-slotvfx.md).
 
@@ -25,7 +25,7 @@ To add or edit Spine animations, use `slotfx_get_spine_rig`, `slotfx_get_spine_a
 
 ## Sequences, Speed keys and protected Spine poses
 
-Read `slotfx://authoring-guide/sequences` for Timeline Director and `slotfx://authoring-guide/slow-motion` for clip Speed keys. Use [the sequence workflow](../motion-sequence/references/timeline-director.md) for examples and recording/export limits. `slotfx_edit_sequence` reads or edits bars, trims, repeats, markers and End as one undoable operation. Use `slotfx_set_clip_slow_motion` for whole-clip ramps; particle velocity does not slow the clip. Inspect played durations, resolved bars, overlaps and game-export blockers after writes.
+Read `slotfx://authoring-guide/sequences` for Timeline Director and `slotfx://authoring-guide/slow-motion` for clip Speed keys. Use [the sequence workflow](../motion-sequence/references/timeline-director.md) for examples and recording/export limits. `slotfx_edit_sequence` reads or edits bars, Spine animation bars, trims, repeats, markers and End as one undoable operation. For a video or anything with more than one shot, build separate shot clips and assemble them on a sequence; see [one clip or a sequence](../motion-sequence/SKILL.md#one-clip-or-a-sequence). Use `slotfx_set_clip_slow_motion` for whole-clip ramps; particle velocity does not slow the clip. Inspect played durations, resolved bars, overlaps and game-export blockers after writes.
 
 Title cards, music/beat grids, marker ties and Blends require an Editor only sequence and are for preview/recording. Game sequences support source clips in Pixi, Phaser, Cocos and WebGL2. Record the sequence ID as `timelineId`; use Scene Animator/scenarios for event-driven flows.
 

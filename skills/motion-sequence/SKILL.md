@@ -1,9 +1,19 @@
 ---
 name: motion-sequence
-description: Author SlotVFX Timeline Director sequences and trailers with clip bars, music, beats, titles, Blends and Speed keys; use Scene Animator and recorder scenarios for event-driven flows.
+description: Plan and author SlotVFX videos, trailers, LinkedIn/social posts and multi-part showcases as Timeline Director sequences of separate shot clips (clip bars, Spine animation bars, music, beats, titles, Blends, Speed keys); decide one clip vs a sequence; use Scene Animator and recorder scenarios for event-driven flows.
 ---
 
 For clips delivered to a game, use [animation review and budgets](../slot-vfx-motion-craft/references/animation-review.md) and `slotfx_review_animation`. Editor-only sequences/recordings have different delivery rules. Recording at 60 fps does not require 60 authored keys per second.
+
+## One clip or a sequence
+
+Decide this before creating anything. Ask: is it one moment, or a story made of several moments?
+
+- **One clip**: one game event (big win, symbol win, transition, in-game logo reveal), parts locked to the same beats (impact, flash, shake and coins on one frame), anything that loops (idle, hold, anticipation), or a post that shows a single effect (record the clip for a few cycles).
+- **Separate clips on a sequence**: separate shots that could be reordered, trimmed, sped up or dropped without touching their insides; music on the beat, title cards, Blends between shots or the same shot played twice; shots that are also game effects (the game keeps the clips, the video arranges them); a Spine character playing several animations in a row (Spine animation bars with mixes).
+- **Scene Animator**: the game decides what plays next.
+
+Videos, trailers, LinkedIn/social posts, multi-logo reels and spin → anticipation → win demo videos are sequences. Never build several shots in one long clip. Plan the shot list first, then follow [Plan shots, then assemble](references/timeline-director.md#plan-shots-then-assemble).
 
 Inspect the scene, existing clips, state machine and any trailer document. Use a clip for one animation, Timeline Director for a fixed arrangement of existing clips, Scene Animator for event-driven states, or a recorder scenario to demonstrate those events. When the connected `slotfx://authoring-guide/sequences` describes `media`, `blends` and `videoEdits`, Video edits are trailer sequences: loose video, images, text and sound go on a trailer sequence's media rows, and older Video edits convert to sequences when opened. Do not convert every sequence into a logo reveal or rebuild the editor externally.
 

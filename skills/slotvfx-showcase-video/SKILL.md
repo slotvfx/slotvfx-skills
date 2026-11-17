@@ -11,6 +11,10 @@ Record only when requested. If the user wants to inspect effects directly in Slo
 
 The sequence/Speed-key routing below covers the 0.9.80 source/tool contract. Older 0.9.50/0.9.59 limits and observations are historical leads. Read the connected schema and `slotfx://authoring-guide/recording`, especially when a setting is refused; verify the actual frames and audio.
 
+## Build multi-shot videos as sequences
+
+A video with more than one shot (trailer, LinkedIn/social post, reel of several effects or logos, spin → anticipation → win demo) is a Timeline Director sequence of separate shot clips, set to Editor only, with music, titles and Blends on the sequence. Do not author every shot into one long clip. Follow [one clip or a sequence](../motion-sequence/SKILL.md#one-clip-or-a-sequence) and [plan shots, then assemble](../motion-sequence/references/timeline-director.md#plan-shots-then-assemble), then record the sequence. A post that shows one effect can be one clip recorded for a few cycles.
+
 ## Record Timeline Director sequences
 
 Use [Timeline Director and Speed-key workflows](../motion-sequence/references/timeline-director.md) and `slotfx://authoring-guide/sequences` for arrangements, music, beat grids, titles and Blends. Record the returned `sequenceId` as `timelineId`; `matchTimeline:true` resolves the full played duration, including source Speed keys. Inspect returned timing instead of multiplying source seconds by output FPS. A source clip's `slowDownSound` controls its sound rate/pitch; sequence music uses the sequence clock.
