@@ -22,6 +22,12 @@ Choose what follows the route:
 
 Inspect the installed path and `emitterFollowsPath` controls; assigning `pathId` alone does not prove which behavior is active. Use one travel driver rather than independently keying the same movement as well. Keep keys for emission/opacity and deliberate positional beats; retain velocity/forces for free ballistic motion, real weapon/bone attachments and existing approved trajectories. Do not convert approved effects solely to adopt a path. This choice controls movement, not the effect's visual construction, and does not establish performance or runtime parity.
 
+## Adapt an effect from an existing game
+
+When the request names an existing game or says to match a previous integration, read its shipped playback and aiming code before editing the preview. Identify the exact clip and group, the animated source anchor, both endpoints and their coordinate space. Reuse the game's placement method and verify the full effect at near and far targets.
+
+Use the existing runtime's A-to-B call for effects driven by live particle travel. If the game places complete clip instances between A and B, preserve the instances and their particles, including the trail and impact. Keep the reference's sizing and orientation. Cropping a final tile can cut away authored glow and particles, so follow the reference's fit for the full copies when it uses one.
+
 ## Connect the moving parts
 
 | Companion | Starting arrangement |
